@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "@google/genai": "latest"
+    "@google/genai": "latest",
+    "@supabase/supabase-js": "latest"
   }
 }
