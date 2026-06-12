@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     const userId = String(message.from.id);
     const userName = message.from?.first_name || "User";
     const text = message.text.trim();
+    const lowerText = text.toLowerCase();
      const isReplyToBot =
   message.reply_to_message?.from?.is_bot === true;
 
