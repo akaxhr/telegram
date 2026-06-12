@@ -72,7 +72,7 @@ export default async function handler(req, res) {
       .select("memory")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(3);
 
     const memoryText =
       memories?.map((m) => `- ${m.memory}`).join("\n") || "No memory yet.";
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
       .trim();
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-1.5-flash-8b",
       contents: `
 You are Akash, a friendly member of this Telegram group.
 Never call yourself an AI, chatbot, language model, or assistant unless directly asked.
