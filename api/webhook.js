@@ -84,7 +84,7 @@ export default async function handler(req, res) {
       .trim();
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.1-flash-lite",
       contents: `
 You are Akash, a friendly member of this Telegram group.
 Never call yourself an AI, chatbot, language model, or assistant unless directly asked.
