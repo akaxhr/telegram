@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const update = req.body;
     const message = update.message;
 
-    if (!message?.text) {
+    if (!message || !message.text) {
       return res.status(200).json({ ok: true });
     }
 
@@ -29,14 +29,15 @@ export default async function handler(req, res) {
     const text = message.text.trim();
     const lowerText = text.toLowerCase();
 
+    const replyUser = message.reply_to_message?.from;
     const isReplyToBot =
-      message.reply_to_message?.from?.username?.toLowerCase() === @akaxhr_bot||
-      message.reply_to_message?.from?.is_bot === true;
+      replyUser?.username?.toLowerCase() === @akaxhr_bot ||
+      replyUser?.is_bot === true;
 
     const shouldReply =
       text.startsWith("/akash") ||
-      /\bakash\b/i.test(text) ||
-      lowerText.includes(`@${akaxh_bot}`) ||
+      lowerText.includes("akash") ||
+      lowerText.includes("@" + akaxhr_bot) ||
       lowerText.startsWith("remember") ||
       isReplyToBot;
 
@@ -54,13 +55,13 @@ export default async function handler(req, res) {
         await supabase.from("memories").insert({
           user_id: userId,
           username: userName,
-          memory,
+          memory: memory
         });
       }
 
       await sendTelegram(
         chatId,
-        `Okay ${userName}, I’ll remember: ${memory}`,
+        "Okay " + userName + ", I will remember: " + memory,
         message.message_id
       );
 
@@ -75,37 +76,34 @@ export default async function handler(req, res) {
       .limit(10);
 
     const memoryText =
-      memories?.map((m) => `- ${m.memory}`).join("\n") || "No memory yet.";
+      memories && memories.length
+        ? memories.map((m) => "- " + m.memory).join("\n")
+        : "No memory yet.";
 
     const cleanText = text
       .replace(/\/akash/gi, "")
-      .replace(new RegExp(`@${BOT_USERNAME}`, "gi"), "")
-      .replace(/\bakash\b/gi, "")
+      .replace(new RegExp("@" + BOT_USERNAME, "gi"), "")
+      .replace(/akash/gi, "")
       .trim();
+
+    const prompt =
+      "You are Akash, a friendly member of this Telegram group.\n" +
+      "Never call yourself an AI, chatbot, language model, or assistant unless directly asked.\n" +
+      "Your name is Akash.\n" +
+      "Speak casually like a normal person.\n" +
+      "Keep replies short and natural.\n\n" +
+      "User name: " + userName + "\n\n" +
+      "User memories:\n" + memoryText + "\n\n" +
+      "User message:\n" + cleanText;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-lite",
-      contents: `
-You are Akash, a friendly member of this Telegram group.
-Never call yourself an AI, chatbot, language model, or assistant unless directly asked.
-Your name is Akash.
-Speak casually like a normal person.
-Keep replies short and natural.
-You can use 😒 when someone teases you.
-
-User name: ${userName}
-
-User memories:
-${memoryText}
-
-User message:
-${cleanText}
-      `,
+      contents: prompt
     });
 
     await sendTelegram(
       chatId,
-      response.text || "I couldn't think of a reply.",
+      response.text || "I could not think of a reply.",
       message.message_id
     );
 
@@ -118,15 +116,17 @@ ${cleanText}
 
 async function sendTelegram(chatId, text, replyTo) {
   await fetch(
-    `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+    "https://api.telegram.org/bot" +
+      process.env.TELEGRAM_BOT_TOKEN +
+      "/sendMessage",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: chatId,
-        text,
-        reply_to_message_id: replyTo,
-      }),
+        text: text,
+        reply_to_message_id: replyTo
+      })
     }
   );
 }
