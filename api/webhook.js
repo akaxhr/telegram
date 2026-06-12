@@ -23,12 +23,18 @@ export default async function handler(req, res) {
     const userId = String(message.from.id);
     const userName = message.from?.first_name || "User";
     const text = message.text.trim();
+     const isReplyToBot =
+      message.reply_to_message?.from?.username === "@akaxhr_bot";
 
     const shouldReply =
       text.startsWith("/akash") ||
+      /\bakash\b/i.test(text) ||
       text.toLowerCase().includes("remember") ||
       text.includes("@akaxhr_bot") ||
-      text.toLowerCase().includes("akash");
+      text.toLowerCase().includes("akash") ||
+      isReplyToBot;
+    
+   
 
     if (!shouldReply) return res.status(200).json({ ok: true });
 
