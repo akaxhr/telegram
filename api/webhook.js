@@ -10,6 +10,14 @@ const supabase = createClient(
 
 const BOT_USERNAME = "akaxhr_bot";
 
+const MODELS = [
+  "gemini-3.1-flash-lite",
+  "gemini-2.5-flash",
+  "gemini-3.5-flash",
+  "gemini-3-flash",
+  "gemini-2.5-flash-lite",
+];
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(200).send("Telegram bot is alive with memory");
@@ -83,9 +91,7 @@ export default async function handler(req, res) {
       .replace(/\bakash\b/gi, "")
       .trim();
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite",
-      contents: `
+    const prompt = `
 You are Akash, a friendly member of this Telegram group.
 Never call yourself an AI, chatbot, language model, or assistant unless directly asked.
 Your name is Akash.
@@ -100,12 +106,13 @@ ${memoryText}
 
 User message:
 ${cleanText}
-      `,
-    });
+      `;
+
+    const responseText = await generateWithFallback(prompt);
 
     await sendTelegram(
       chatId,
-      response.text || "I couldn't think of a reply.",
+      responseText || "I couldn't think of a reply.",
       message.message_id
     );
 
@@ -114,6 +121,25 @@ ${cleanText}
     console.error("Webhook error:", err);
     return res.status(200).json({ ok: true });
   }
+}
+
+async function generateWithFallback(prompt) {
+  for (const model of MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+      });
+
+      if (response.text) {
+        return response.text;
+      }
+    } catch (err) {
+      console.error("Model failed:", model, err.message);
+    }
+  }
+
+  return null;
 }
 
 async function sendTelegram(chatId, text, replyTo) {
