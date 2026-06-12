@@ -30,13 +30,13 @@ export default async function handler(req, res) {
     const lowerText = text.toLowerCase();
 
     const isReplyToBot =
-      message.reply_to_message?.from?.username?.toLowerCase() === @akaxhr_bot ||
+      message.reply_to_message?.from?.username?.toLowerCase() === BOT_USERNAME ||
       message.reply_to_message?.from?.is_bot === true;
 
     const shouldReply =
       text.startsWith("/akash") ||
       /\bakash\b/i.test(text) ||
-      lowerText.includes(`@${akaxhr_bot}`) ||
+      lowerText.includes(`@${BOT_USERNAME}`) ||
       lowerText.startsWith("remember") ||
       isReplyToBot;
 
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
 
     const cleanText = text
       .replace(/\/akash/gi, "")
-      .replace(new RegExp(`@${akaxhr_bot}`, "gi"), "")
+      .replace(new RegExp(`@${BOT_USERNAME}`, "gi"), "")
       .replace(/\bakash\b/gi, "")
       .trim();
 
