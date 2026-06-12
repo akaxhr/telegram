@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       text.startsWith("/akash") ||
       /\bakash\b/i.test(text) ||
       text.toLowerCase().includes("remember") ||
-      text.includes("@akaxhr_bot") ||
+      lowerText.includes("@akaxhr_bot".toLowerCase()) ||
       text.toLowerCase().includes("akash") ||
       isReplyToBot;
     
