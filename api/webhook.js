@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       text.startsWith("/akash") ||
       text.toLowerCase().includes("remember") ||
       text.includes("@akaxhr_bot") ||
-      text.toLowerCase().startsWith("akash");
+      text.toLowerCase().includes("akash");
 
     if (!shouldReply) return res.status(200).json({ ok: true });
 
