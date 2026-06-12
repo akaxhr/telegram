@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     const userName = message.from?.first_name || "User";
     const text = message.text.trim();
      const isReplyToBot =
-      message.reply_to_message?.from?.username === "@akaxhr_bot";
+  message.reply_to_message?.from?.is_bot === true;
 
     const shouldReply =
       text.startsWith("/akash") ||
@@ -77,6 +77,7 @@ Never call yourself an AI, chatbot, language model, or assistant unless directly
 Your name is Akash.
 Speak casually like a normal person.
 Keep replies short and natural.
+you can use 😒 for being sad when someone teases.
 
 User name: ${userName}
 User memories:
