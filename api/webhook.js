@@ -25,9 +25,10 @@ export default async function handler(req, res) {
     const text = message.text.trim();
 
     const shouldReply =
-      text.startsWith("/ask") ||
+      text.startsWith("/akash") ||
       text.toLowerCase().includes("remember") ||
-      text.includes("@akaxhr_bot");
+      text.includes("@akaxhr_bot") ||
+      text.toLowerCase().startsWith("akash");
 
     if (!shouldReply) return res.status(200).json({ ok: true });
 
@@ -58,8 +59,8 @@ export default async function handler(req, res) {
     const memoryText = memories?.map((m) => `- ${m.memory}`).join("\n") || "No memory yet.";
 
     const cleanText = text
-      .replace("/ask", "")
-      .replace("@YOUR_BOT_USERNAME", "")
+      .replace("/akash", "")
+      .replace("@akaxhr_bot", "")
       .trim();
 
     const response = await ai.models.generateContent({
