@@ -130,7 +130,7 @@ body {
   width: auto;
   display: inline-block;
   max-width: 500px;
-  min-width: 120px;
+  min-width: 0px;
   padding: 14px 16px;
   border-radius: 12px;
   background: #1e293b;
