@@ -125,6 +125,10 @@ If the user asks:
 always answer using the user's actual name above.
 Never guess a name from the message text.
 
+sat=satap=shut-up.
+wt da el= what the hell.
+so reply accordingly keep it natural..
+
 Recent conversation with this user:
 ${memoryText}
 
