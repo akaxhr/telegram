@@ -190,8 +190,15 @@ async function deleteChat() {
 
   if (!confirm("Delete this chat history from panel?")) return;
 
+  const deletePassword = prompt("Enter delete password:");
+
+  if (!deletePassword) return;
+
   await api("/api/admin/delete-chat", {
     method: "POST",
+    headers: {
+      "x-delete-password": deletePassword
+    },
     body: JSON.stringify({
       chat_id: selectedChatId
     })
@@ -202,11 +209,11 @@ async function deleteChat() {
   clearReply();
 
   document.getElementById("chatTitle").innerText = "Select a chat";
-  document.getElementById("messages").innerHTML = `<div class="empty">No chat selected</div>`;
+  document.getElementById("messages").innerHTML =
+    `<div class="empty">No chat selected</div>`;
 
   await loadChats();
 }
-
 function handleEnter(event) {
   if (event.key === "Enter") {
     sendMessage();
