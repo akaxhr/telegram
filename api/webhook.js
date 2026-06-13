@@ -1,22 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
-import { createClient } from "@supabase/supabase-js";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+import { generateWithFallback } from "../lib/ai.js";
+import { getMemories, saveMemory } from "../lib/memory.js";
+import { sendTelegram } from "../lib/telegram.js";
 
 const BOT_USERNAME = "akaxhr_bot";
-
-const MODELS = [
-  "gemini-3.1-flash-lite",
-  "gemini-2.5-flash",
-  "gemini-3.5-flash",
-  "gemini-3-flash",
-  "gemini-2.5-flash-lite",
-];
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -59,11 +45,7 @@ export default async function handler(req, res) {
         .trim();
 
       if (memory) {
-        await supabase.from("memories").insert({
-          user_id: userId,
-          username: userName,
-          memory,
-        });
+        await saveMemory(userId, userName, memory);
       }
 
       await sendTelegram(
@@ -75,15 +57,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true });
     }
 
-    const { data: memories } = await supabase
-      .from("memories")
-      .select("memory")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(3);
-
-    const memoryText =
-      memories?.map((m) => `- ${m.memory}`).join("\n") || "No memory yet.";
+    const memoryText = await getMemories(userId);
 
     const cleanText = text
       .replace(/\/akash/gi, "")
@@ -123,38 +97,4 @@ ${cleanText}
     console.error("Webhook error:", err);
     return res.status(200).json({ ok: true });
   }
-}
-
-async function generateWithFallback(prompt) {
-  for (const model of MODELS) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: prompt,
-      });
-
-      if (response.text) {
-        return response.text;
-      }
-    } catch (err) {
-      console.error("Model failed:", model, err.message);
-    }
-  }
-
-  return null;
-}
-
-async function sendTelegram(chatId, text, replyTo) {
-  await fetch(
-    `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-        reply_to_message_id: replyTo,
-      }),
-    }
-  );
 }
