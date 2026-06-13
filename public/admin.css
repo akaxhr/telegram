@@ -136,7 +136,7 @@ body {
   min-width: 0px;
   border-radius: 12px;
   background: #1e293b;
-  line-height: 1;
+  line-height: 1.2;
   white-space: pre-wrap;
   word-break: break-word;
 }  
@@ -144,7 +144,7 @@ body {
 .bubble p,
 .bubble span,
 .bubble div {
-  margin: 0;                /* remove default spacing */
+  margin: -1;                /* remove default spacing */
 }
 
 .bot .bubble {
