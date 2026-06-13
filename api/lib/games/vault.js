@@ -1,4 +1,4 @@
-import { supabase } from "./supabase.js";
+import { supabase } from "../supabase.js";
 
 const BASE_REWARD = 300;
 const MISS_COST = 10;
