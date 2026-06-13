@@ -1,8 +1,8 @@
-let password = localStorage.getItem("admin_password");
+let password = sessionStorage.getItem("admin_password");
 
 if (!password) {
   password = prompt("Admin password:");
-  localStorage.setItem("admin_password", password);
+  sessionStorage.setItem("admin_password", password);
 }
 
 let selectedChatId = null;
@@ -20,7 +20,7 @@ async function api(path, options = {}) {
   const res = await fetch(path, options);
 
   if (res.status === 401) {
-    localStorage.removeItem("admin_password");
+    sessionStorage.removeItem("admin_password");
     alert("Wrong admin password. Refresh and try again.");
     throw new Error("Unauthorized");
   }
