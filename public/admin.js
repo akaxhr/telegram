@@ -42,7 +42,6 @@ function escapeHtml(text) {
 
 async function loadChats() {
   const data = await api("/api/admin/chats");
-
   const box = document.getElementById("chats");
   box.innerHTML = "";
 
@@ -51,7 +50,15 @@ async function loadChats() {
     return;
   }
 
-  data.chats.forEach(chat => {
+  const search = document.getElementById("chatSearch")?.value.toLowerCase() || "";
+
+  const chats = data.chats.filter(chat =>
+    String(chat.chat_title || "").toLowerCase().includes(search) ||
+    String(chat.chat_id || "").toLowerCase().includes(search) ||
+    String(chat.chat_type || "").toLowerCase().includes(search)
+  );
+
+  chats.forEach(chat => {
     const div = document.createElement("div");
     div.className = "chat-item";
 
@@ -81,8 +88,18 @@ async function loadChats() {
 async function loadMessages() {
   if (!selectedChatId) return;
 
-  const data = await api("/api/admin/messages?chat_id=" + encodeURIComponent(selectedChatId));
   const box = document.getElementById("messages");
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+
+  const search = document.getElementById("messageSearch")?.value || "";
+
+  const data = await api(
+    "/api/admin/messages?chat_id=" +
+      encodeURIComponent(selectedChatId) +
+      "&search=" +
+      encodeURIComponent(search)
+  );
+
   box.innerHTML = "";
 
   if (!data.messages || data.messages.length === 0) {
@@ -94,7 +111,7 @@ async function loadMessages() {
     const row = document.createElement("div");
     row.className = "message-row " + (m.is_bot ? "bot" : "");
 
-    const canReply = m.telegram_message_id ? true : false;
+    const canReply = !!m.telegram_message_id;
 
     row.innerHTML = `
       <div class="bubble">
@@ -112,12 +129,9 @@ async function loadMessages() {
     box.appendChild(row);
   });
 
-const box = document.getElementById("messages");
-const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
-box.innerHTML = "";
-if (nearBottom) {
-  box.scrollTop = box.scrollHeight;
-}
+  if (nearBottom) {
+    box.scrollTop = box.scrollHeight;
+  }
 }
 
 function selectReply(messageId, username) {
@@ -160,6 +174,31 @@ async function sendMessage() {
   clearReply();
 
   await loadMessages();
+  await loadChats();
+}
+
+async function deleteChat() {
+  if (!selectedChatId) {
+    alert("Select a chat first");
+    return;
+  }
+
+  if (!confirm("Delete this chat history from panel?")) return;
+
+  await api("/api/admin/delete-chat", {
+    method: "POST",
+    body: JSON.stringify({
+      chat_id: selectedChatId
+    })
+  });
+
+  selectedChatId = null;
+  selectedChatTitle = null;
+  clearReply();
+
+  document.getElementById("chatTitle").innerText = "Select a chat";
+  document.getElementById("messages").innerHTML = `<div class="empty">No chat selected</div>`;
+
   await loadChats();
 }
 
