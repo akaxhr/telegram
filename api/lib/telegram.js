@@ -4,7 +4,6 @@ export async function sendTelegram(chatId, text, replyTo = null, chatTitle = "Bo
   const body = {
     chat_id: chatId,
     text,
-    parse_mode: "Markdown",
   };
 
   if (replyTo) {
