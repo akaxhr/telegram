@@ -24,6 +24,15 @@ export default async function handler(req, res) {
     const text = message.text.trim();
     const lowerText = text.toLowerCase();
 
+    await saveMessage({
+  chat_id: String(chatId),
+  chat_title: message.chat.title || message.chat.first_name || "Private Chat",
+  user_id: userId,
+  username: userName,
+  message_text: text,
+  is_bot: false,
+});
+
     const isReplyToBot =
       message.reply_to_message?.from?.username?.toLowerCase() === BOT_USERNAME ||
       message.reply_to_message?.from?.is_bot === true;
