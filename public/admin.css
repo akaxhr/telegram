@@ -142,10 +142,9 @@ body {
   word-break: break-word;
 }  
 
-.bubble p,
-.bubble span,
-.bubble div {
-  margin: -1;                /* remove default spacing */
+.bubble * {
+  margin: 0;
+  padding: 0;/* remove default spacing */
 }
 
 .bot .bubble {
