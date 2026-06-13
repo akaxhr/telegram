@@ -44,13 +44,15 @@ export default async function handler(req, res) {
       message.reply_to_message?.from?.username?.toLowerCase() === BOT_USERNAME ||
       message.reply_to_message?.from?.is_bot === true;
 
-    const shouldReply =
-      text.startsWith("/akash") ||
-      /\bakash\b/i.test(text) ||
-      lowerText.includes(`@${BOT_USERNAME}`) ||
-      lowerText.startsWith("remember") ||
-      isReplyToBot;
+    const isPrivateChat = message.chat.type === "private";
 
+const shouldReply =
+  isPrivateChat ||
+  text.startsWith("/akash") ||
+  /\bakash\b/i.test(text) ||
+  lowerText.includes(`@${BOT_USERNAME}`) ||
+  lowerText.startsWith("remember") ||
+  isReplyToBot;
     if (!shouldReply) {
       return res.status(200).json({ ok: true });
     }
