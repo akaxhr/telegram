@@ -117,8 +117,8 @@ body {
   margin-bottom: 18px;
 }
 
-.message-row.bot {
-  justify-content: flex-end;
+.message-row.bot .bubble {
+  width: auto;
 }
 
 .bubble {
