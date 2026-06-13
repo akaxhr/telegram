@@ -1,5 +1,5 @@
 import { generateWithFallback } from "./lib/ai.js";
-import { getMemories, saveMemory } from "./lib/memory.js";
+import { getUserHistory, saveUserHistory } from "./lib/memory.js";
 import { sendTelegram } from "./lib/telegram.js";
 import { saveMessage } from "./lib/messages.js";
 
@@ -39,6 +39,7 @@ export default async function handler(req, res) {
   reply_to_message_id: message.reply_to_message?.message_id || null,
   is_bot: false,
 });
+    await saveUserHistory(userId, userName, "user", text);
 
     const isReplyToBot =
       message.reply_to_message?.from?.username?.toLowerCase() === BOT_USERNAME ||
@@ -57,26 +58,9 @@ const shouldReply =
       return res.status(200).json({ ok: true });
     }
 
-    if (lowerText.startsWith("remember")) {
-      const memory = text
-        .replace(/remember that/i, "")
-        .replace(/remember/i, "")
-        .trim();
+    
 
-      if (memory) {
-        await saveMemory(userId, userName, memory);
-      }
-
-      await sendTelegram(
-        chatId,
-        `Okay ${userName}, I’ll remember: ${memory}`,
-        message.message_id
-      );
-
-      return res.status(200).json({ ok: true });
-    }
-
-    const memoryText = await getMemories(userId);
+    const memoryText = await getUserHistory(userId);
 
     const cleanText = text
       .replace(/\/akash/gi, "")
@@ -96,7 +80,7 @@ Never claim to be an AI unless directly asked.
 
 User name: ${userName}
 
-User memories:
+Recent conversation with this user:
 ${memoryText}
 
 User message:
@@ -105,11 +89,11 @@ ${cleanText}
 
     const responseText = await generateWithFallback(prompt);
 
-    await sendTelegram(
-      chatId,
-      responseText || "I couldn't think of a reply.",
-      message.message_id
-    );
+    const finalReply = responseText || "I couldn't think of a reply.";
+
+await sendTelegram(chatId, finalReply, message.message_id);
+
+await saveUserHistory(userId, "Akash", "bot", finalReply);
 
     return res.status(200).json({ ok: true });
   } catch (err) {
