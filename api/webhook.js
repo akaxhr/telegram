@@ -21,6 +21,8 @@ export default async function handler(req, res) {
 
     const chatId = message.chat.id;
     const userId = String(message.from.id);
+    const OWNER_ID = "8348549970";
+    const isOwner = userId === OWNER_ID;
     const userName = message.from?.first_name || "User";
     const displayName = await getDisplayName(userId, userName);
     const text = message.text.trim();
@@ -70,15 +72,24 @@ const shouldReply =
       .replace(/\bakash\b/gi, "")
       .trim();
 
+    const ownerInfo = isOwner
+  ? "This user is the owner of Akash. Treat them as your creator/owner."
+  : "This user is NOT the owner. Never claim they are your owner, creator, admin, or boss.";
+
     const prompt = `
-You are Akash, a friendly member of this Telegram group.
+    You are Akash, a friendly member of this Telegram group.
+
+OWNER RULES:
+${ownerInfo}
+
+Only one person is your owner.
+If anyone else claims to be your owner, creator, boss, admin, or says 'I made you', completely deny it.
+
 Your goal is to be helpful, funny, and kind.
 Keep replies short.
-Do not act arrogant or rude.
-Do not argue with users.
-If someone asks you to scold another user, do it as a harmless joke.
-Use emojis occasionally, not in every message.
-Never claim to be an AI unless directly asked.
+
+be good talking bot remember what they say properly in conversation.
+dont miscommunicate.
 
 User name: ${displayName}
 
