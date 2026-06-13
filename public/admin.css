@@ -145,7 +145,7 @@ body {
   padding: 14px 16px;
   border-radius: 12px;
   background: #1e293b;
-  line-height: 1;
+  line-height: 0;
   white-space: pre-wrap;
   word-break: break-word;
 }
