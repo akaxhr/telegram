@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   if (req.body.reply_password !== process.env.REPLY_PASSWORD) {
-  return res.status(401).json({ error: "Wrong reply password" });
+  return res.status(403).json({ error: "Wrong reply password" });
 }
 
   if (req.method !== "POST") {
