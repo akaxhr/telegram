@@ -17,7 +17,7 @@ async function trimOldMessages(chatId) {
     .select("id")
     .eq("chat_id", chatId)
     .order("created_at", { ascending: false })
-    .range(100, 10000);
+    .range(3000, 10000);
 
   if (error) {
     console.error("Trim fetch error:", error.message);
