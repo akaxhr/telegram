@@ -239,6 +239,26 @@ button:hover {
   text-align: center;
   margin-top: 40px;
 }
+.message-wrap {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.message-text {
+  line-height: 1;
+}
+
+.message-row.bot {
+  justify-content: flex-end;
+}
 
 @media (max-width: 768px) {
   .sidebar {
@@ -252,4 +272,5 @@ button:hover {
   .bubble {
     max-width: 100%;
   }
+
 }
