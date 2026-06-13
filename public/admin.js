@@ -24,6 +24,13 @@ async function api(path, options = {}) {
     alert("Wrong admin password. Refresh and try again.");
     throw new Error("Unauthorized");
   }
+  
+  if (res.status === 403) {
+  alert("Wrong reply/delete password.");
+  throw new Error("Forbidden");
+}
+
+
 
   return res.json();
 }
