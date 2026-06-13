@@ -17,7 +17,7 @@ export async function getUserHistory(userId) {
     .select("username, role, message_text")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(500);
 
   return (
     data
@@ -33,7 +33,7 @@ async function trimUserHistory(userId) {
     .select("id")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
-    .range(100, 10000);
+    .range(500, 10000);
 
   if (!data?.length) return;
 
