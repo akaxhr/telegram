@@ -130,19 +130,11 @@ body {
   flex-direction: column;
   width: fit-content;
 }
-
-.message-meta {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-top: 4px;
-}
 .bubble {
   width: auto;
   display: inline-block;
   max-width: 500px;
   min-width: 0px;
-  padding: 14px 16px;
   border-radius: 12px;
   background: #1e293b;
   line-height: normal;
@@ -246,9 +238,7 @@ button:hover {
   text-align: center;
   margin-top: 40px;
 }
-.message-wrap {
-  max-width: 70%;
-}
+
 
 .message-meta {
   display: flex;
