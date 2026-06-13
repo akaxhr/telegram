@@ -134,10 +134,11 @@ body {
   width: auto;
   display: inline-block;
   max-width: 500px;
+  padding: 8px 12px;
   min-width: 0px;
   border-radius: 12px;
   background: #1e293b;
-  line-height: normal;
+  line-height: 0.5;
   white-space: pre-wrap;
   word-break: break-word;
 }
