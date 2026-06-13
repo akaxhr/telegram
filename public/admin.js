@@ -112,7 +112,12 @@ async function loadMessages() {
     box.appendChild(row);
   });
 
+const box = document.getElementById("messages");
+const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+box.innerHTML = "";
+if (nearBottom) {
   box.scrollTop = box.scrollHeight;
+}
 }
 
 function selectReply(messageId, username) {
