@@ -50,54 +50,7 @@ export default async function handler(req, res) {
       message.reply_to_message?.from?.is_bot === true;
 
     const isPrivateChat = message.chat.type === "private";
-
-    async function replaceMentions(text) {
-  const mentionRegex = /\{\{mention:([^}]+)\}\}/gi;
-  let result = text;
-  const matches = [...text.matchAll(mentionRegex)];
-
-  for (const match of matches) {
-    const fullMatch = match[0];
-    const nickname = match[1].trim().toLowerCase();
-
-    const { data: user } = await supabase
-      .from("aliases")
-      .select("user_id, alias")
-      .ilike("alias", nickname)
-      .single();
-
-    if (user?.user_id) {
-      const safeName = escapeMarkdown(user.alias || nickname);
-      result = result.replace(
-        fullMatch,
-        `[${safeName}](tg://user?id=${user.user_id})`
-      );
-    } else {
-      result = result.replace(fullMatch, nickname);
-    }
-  }
-
-  return result;
-}
-
-function escapeMarkdown(text) {
-  return String(text).replace(/[_*[\]()~`>#+\-=|{}.!]/g, "\\$&");
-}
-
-const shouldReply =
-  isPrivateChat ||
-  text.startsWith("/akash") ||
-  /\bakash\b/i.test(text) ||
-  lowerText.includes(`@${BOT_USERNAME}`) ||
-  lowerText.startsWith("remember") ||
-  isReplyToBot;
-    if (!shouldReply) {
-      return res.status(200).json({ ok: true });
-    }
-
-    
-
-    const memoryText = await getUserHistory(userId);
+   const memoryText = await getUserHistory(userId);
 
     const cleanText = text
       .replace(/\/akash/gi, "")
@@ -140,13 +93,7 @@ ${cleanText}
 
     const responseText = await generateWithFallback(prompt);
 
-    let finalReply = responseText || "I couldn't think of a reply.";
-
-if (isOwner) {
-  finalReply = await replaceMentions(finalReply);
-} else {
-  finalReply = finalReply.replace(/\{\{mention:.*?\}\}/gi, "");
-}
+   const finalReply = responseText || "I couldn't think of a reply.";
 
 await sendTelegram(chatId, finalReply, message.message_id);
 
