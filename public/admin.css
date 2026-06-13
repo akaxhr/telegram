@@ -123,8 +123,8 @@ body {
 
 .bubble {
   max-width: 70%;
-  min-width: 180px;
   width: fit-content;
+  min-width: 120px;
   padding: 14px 16px;
   border-radius: 12px;
   background: #1e293b;
