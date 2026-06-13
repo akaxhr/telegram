@@ -1,5 +1,34 @@
 * { box-sizing: border-box; }
 
+
+
+
+.sidebar-tools,
+.message-search {
+  padding: 10px;
+  background: #020617;
+  border-bottom: 1px solid #334155;
+}
+
+.sidebar-tools input,
+.message-search input {
+  width: 100%;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.danger {
+  background: #dc2626;
+  padding: 8px 12px;
+}
+
+.danger:hover {
+  background: #b91c1c;
+}
 body {
   margin: 0;
   font-family: Arial, sans-serif;
