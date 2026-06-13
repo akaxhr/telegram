@@ -114,18 +114,23 @@ async function loadMessages() {
     const canReply = !!m.telegram_message_id;
 
     row.innerHTML = `
-      <div class="bubble">
-        <div class="sender">${escapeHtml(m.username || (m.is_bot ? "Akash" : "User"))}</div>
-        <div>${escapeHtml(m.message_text)}</div>
-        <div class="time">${formatTime(m.created_at)}</div>
-        ${
-          canReply
-            ? `<button class="reply-button" onclick="selectReply(${m.telegram_message_id}, '${escapeHtml(m.username || "User")}')">Reply</button>`
-            : ""
-        }
-      </div>
-    `;
+  <div class="message-wrap">
+    <div class="sender">${escapeHtml(m.username || (m.is_bot ? "Akash" : "User"))}</div>
 
+    <div class="bubble">
+      <div class="message-text">${escapeHtml(m.message_text)}</div>
+    </div>
+
+    <div class="message-meta">
+      <span class="time">${formatTime(m.created_at)}</span>
+      ${
+        canReply
+          ? `<button class="reply-button" onclick="selectReply(${m.telegram_message_id}, '${escapeHtml(m.username || "User")}')">Reply</button>`
+          : ""
+      }
+    </div>
+  </div>
+`;
     box.appendChild(row);
   });
 
