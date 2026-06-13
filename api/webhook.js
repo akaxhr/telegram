@@ -1,3 +1,4 @@
+import { handleDice } from "./games/dice.js";
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
 
