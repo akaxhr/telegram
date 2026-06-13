@@ -17,7 +17,7 @@ export async function getUserHistory(userId) {
     .select("username, role, message_text")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
-    .limit(500);
+    .limit(50);
 
   return (
     data
