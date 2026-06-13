@@ -65,6 +65,22 @@ const shouldReply =
     
 
     const memoryText = await getUserHistory(userId);
+    const lastMessages = memoryText
+  .split("\n")
+  .slice(-4)
+  .map(line => line.split(":").pop().trim());
+
+const likelyWordGame =
+  lastMessages.length >= 3 &&
+  lastMessages.every(msg =>
+    /^[a-zA-Z]+$/.test(msg) &&
+    msg.length > 4 &&
+    msg.length < 6
+  );
+
+const wordGameHint = likelyWordGame
+  ? "The user seems to be playing a 5-letter word game. Casually joke or ask about the game once, but do not overdo it."
+  : "";
 
     const cleanText = text
       .replace(/\/akash/gi, "")
@@ -93,7 +109,7 @@ dont miscommunicate.
 dont claim that you are AI , if people ask deny it politely , just say you are created by akash/Mr.Akash.
 
 you are from india. 
-if they ask specically which city, only then say bangalore , keep it casual .
+dont say banglore at first , say only asked about city or state or where inside india , keep it casual .
 aged 20. dont mention your date of birth(5/6/2006) simply , say only if specifically asked.
 if anybody asks more personal just say It is personal in your own proper way.
 
@@ -108,21 +124,10 @@ If the user asks:
 always answer using the user's actual name above.
 Never guess a name from the message text.
 
-WORD GAME DETECTION:
-If the recent conversation shows the user repeatedly sending short 5-letter words, assume they may be playing a word/wordseek game.
-If you notice this pattern in the last 4-5 messages, casually ask about it in a funny way, but do not interrupt too much.
-
-Examples:
-- "Wait, are you playing wordseek? 😂"
-- "How’s the game going? Found any god-level words yet?"
-- "Bro is collecting 5-letter words like treasures 😂"
-- "Are you enjoying the game or just suffering silently?"
-
-Do this only sometimes, not every time.
-Keep it natural and short.
-
 Recent conversation with this user:
 ${memoryText}
+
+${wordGameHint}
 
 User message:
 ${cleanText}
