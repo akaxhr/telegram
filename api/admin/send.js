@@ -1,4 +1,3 @@
-import { supabase } from "../lib/supabase.js";
 import { sendTelegram } from "../lib/telegram.js";
 
 export default async function handler(req, res) {
@@ -12,25 +11,17 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { chat_id, text } = req.body;
+  const { chat_id, text, reply_to_message_id } = req.body;
 
   if (!chat_id || !text) {
     return res.status(400).json({ error: "chat_id and text required" });
   }
 
-  const { chat_id, text, reply_to_message_id } = req.body;
-  const result = await sendTelegram(chat_id, text, reply_to_message_id);
-
-  const result = await sendTelegram(chat_id, text);
-
-  await supabase.from("bot_messages").insert({
-    chat_id: String(chat_id),
-    chat_title: "Admin Sent",
-    user_id: "bot_admin",
-    username: "Akash Panel",
-    message_text: text,
-    is_bot: true,
-  });
+  const result = await sendTelegram(
+    chat_id,
+    text,
+    reply_to_message_id || null
+  );
 
   return res.status(200).json({
     ok: true,
