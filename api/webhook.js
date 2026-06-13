@@ -22,6 +22,7 @@ export default async function handler(req, res) {
     const chatId = message.chat.id;
     const userId = String(message.from.id);
     const userName = message.from?.first_name || "User";
+    const displayName = await getDisplayName(userId, userName);
     const text = message.text.trim();
     const lowerText = text.toLowerCase();
 
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
     "Private Chat",
   chat_type: message.chat.type,
   user_id: userId,
-  username: userName,
+  username: displayName,
   message_text: text,
   telegram_message_id: message.message_id,
   reply_to_message_id: message.reply_to_message?.message_id || null,
@@ -79,7 +80,7 @@ If someone asks you to scold another user, do it as a harmless joke.
 Use emojis occasionally, not in every message.
 Never claim to be an AI unless directly asked.
 
-User name: ${userName}
+User name: ${displayName}
 
 Recent conversation with this user:
 ${memoryText}
@@ -94,7 +95,7 @@ ${cleanText}
 
 await sendTelegram(chatId, finalReply, message.message_id);
 
-await saveUserHistory(userId, "Akash", "bot", finalReply);
+await saveUserHistory(userId, displayName, "user", text);
 
     return res.status(200).json({ ok: true });
   } catch (err) {
