@@ -8,18 +8,22 @@ export default async function handler(req, res) {
   }
 
   const chatId = req.query.chat_id;
+const search = req.query.search || "";
 
-  if (!chatId) {
-    return res.status(400).json({ error: "chat_id required" });
-  }
+let query = supabase
+  .from("bot_messages")
+  .select("*")
+  .eq("chat_id", chatId)
+  .order("created_at", { ascending: true })
+  .limit(100);
 
-  const { data, error } = await supabase
-    .from("bot_messages")
-    .select("*")
-    .eq("chat_id", chatId)
-    .order("created_at", { ascending: true })
-    .limit(100);
+if (search) {
+  query = query.or(
+    `message_text.ilike.%${search}%,username.ilike.%${search}%`
+  );
+}
 
+const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
 
   return res.status(200).json({ messages: data });
