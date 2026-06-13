@@ -125,7 +125,16 @@ body {
 .message-row.bot .bubble {
   width: auto;
 }
+.message-wrap {
+  max-width: 70%;
+}
 
+.message-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
 .bubble {
   width: auto;
   display: inline-block;
