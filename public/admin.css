@@ -115,6 +115,11 @@ body {
 .message-row {
   display: flex;
   margin-bottom: 18px;
+  width: 100%;
+}
+
+.message-row.bot {
+  justify-content: flex-end;
 }
 
 .message-row.bot .bubble {
@@ -229,4 +234,14 @@ button:hover {
   color: #94a3b8;
   text-align: center;
   margin-top: 40px;
+}
+.message-wrap {
+  max-width: 70%;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
 }
