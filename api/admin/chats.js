@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   const { data, error } = await supabase
     .from("bot_messages")
-    .select("chat_id, chat_title, created_at")
+    .select("chat_id, chat_title, chat_type, created_at")
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json({ error: error.message });
