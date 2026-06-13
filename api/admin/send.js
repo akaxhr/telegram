@@ -7,6 +7,10 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  if (req.body.reply_password !== process.env.REPLY_PASSWORD) {
+  return res.status(401).json({ error: "Wrong reply password" });
+}
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
