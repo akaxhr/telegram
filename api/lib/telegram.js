@@ -1,125 +1,41 @@
-import { generateWithFallback } from "./lib/ai.js";
-import { getUserHistory, saveUserHistory } from "./lib/memory.js";
-import { sendTelegram } from "./lib/telegram.js";
-import { saveMessage } from "./lib/messages.js";
-import { getDisplayName } from "./lib/aliases.js";
+import { saveMessage } from "./messages.js";
 
-const BOT_USERNAME = "akaxhr_bot";
+export async function sendTelegram(chatId, text, replyTo = null, chatTitle = "Bot Reply") {
+  const body = {
+    chat_id: chatId,
+    text,
+  };
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(200).send("Telegram bot is alive with memory");
+  if (replyTo) {
+    body.reply_to_message_id = replyTo;
   }
 
-  try {
-    const update = req.body;
-    const message = update.message;
-
-    if (!message?.text) {
-      return res.status(200).json({ ok: true });
+  const res = await fetch(
+    `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     }
+  );
 
-    const chatId = message.chat.id;
-    const userId = String(message.from.id);
-    const OWNER_ID = "8348549970";
-    const isOwner = userId === OWNER_ID;
-    const userName = message.from?.first_name || "User";
-    const displayName = await getDisplayName(userId, userName);
-    const text = message.text.trim();
-    const lowerText = text.toLowerCase();
+  const result = await res.json();
 
-    await saveMessage({
-  chat_id: String(chatId),
-  chat_title:
-    message.chat.title ||
-    message.chat.first_name ||
-    message.chat.username ||
-    "Private Chat",
-  chat_type: message.chat.type,
-  user_id: userId,
-  username: displayName,
-  message_text: text,
-  telegram_message_id: message.message_id,
-  reply_to_message_id: message.reply_to_message?.message_id || null,
-  is_bot: false,
-});
-    await saveUserHistory(userId, userName, "user", text);
-
-    const isReplyToBot =
-      message.reply_to_message?.from?.username?.toLowerCase() === BOT_USERNAME ||
-      message.reply_to_message?.from?.is_bot === true;
-
-    const isPrivateChat = message.chat.type === "private";
-
-const shouldReply =
-  isPrivateChat ||
-  text.startsWith("/akash") ||
-  /\bakash\b/i.test(text) ||
-  lowerText.includes(`@${BOT_USERNAME}`) ||
-  lowerText.startsWith("remember") ||
-  isReplyToBot;
-    if (!shouldReply) {
-      return res.status(200).json({ ok: true });
-    }
-
-    
-
-    const memoryText = await getUserHistory(userId);
-
-    const cleanText = text
-      .replace(/\/akash/gi, "")
-      .replace(new RegExp(`@${BOT_USERNAME}`, "gi"), "")
-      .replace(/\bakash\b/gi, "")
-      .trim();
-
-    const ownerInfo = isOwner
-  ? "This user is the owner of Akash. Treat them as your creator/owner."
-  : "This user is NOT the owner. Never claim they are your owner, creator, admin, or boss.";
-
-    const prompt = `
-    You are Akash, a friendly member of this Telegram group.
-
-OWNER RULES:
-${ownerInfo}
-
-Only one person is your owner.
-If anyone else claims to be your owner, creator, boss, admin, or says 'I made you', completely deny it.
-
-Your goal is to be helpful, funny, and kind.
-Keep replies short.
-
-be good talking bot remember what they say properly in conversation.
-dont miscommunicate.
-
-The user's name is ${displayName}.
-
-If the user asks:
-- "what is my name"
-- "who am i"
-- "do you know my name"
-
-always answer using the user's actual name above.
-
-Never guess a name from the message text.
-
-Recent conversation with this user:
-${memoryText}
-
-User message:
-${cleanText}
-      `;
-
-    const responseText = await generateWithFallback(prompt);
-
-    const finalReply = responseText || "I couldn't think of a reply.";
-
-await sendTelegram(chatId, finalReply, message.message_id);
-
-await saveUserHistory(userId, displayName, "user", text);
-
-    return res.status(200).json({ ok: true });
-  } catch (err) {
-    console.error("Webhook error:", err);
-    return res.status(200).json({ ok: true });
+  if (!result.ok) {
+    console.error("Telegram send error:", result);
+    return result;
   }
+
+  await saveMessage({
+    chat_id: String(chatId),
+    chat_title: chatTitle,
+    user_id: "bot",
+    username: "Akash",
+    message_text: text,
+    telegram_message_id: result.result?.message_id || null,
+    reply_to_message_id: replyTo || null,
+    is_bot: true,
+  });
+
+  return result;
 }
