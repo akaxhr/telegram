@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Akash Bot Panel</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#111; color:white; }
+    .app { display:flex; height:100vh; }
+    .sidebar { width:280px; background:#1e1e1e; overflow:auto; }
+    .chat { flex:1; display:flex; flex-direction:column; }
+    .chat-item { padding:15px; border-bottom:1px solid #333; cursor:pointer; }
+    .chat-item:hover { background:#333; }
+    .messages { flex:1; padding:20px; overflow:auto; }
+    .msg { margin:8px 0; padding:10px; border-radius:10px; max-width:70%; background:#333; }
+    .bot { margin-left:auto; background:#245c3a; }
+    .input { display:flex; padding:10px; background:#1e1e1e; }
+    input { flex:1; padding:12px; border-radius:8px; border:0; }
+    button { margin-left:8px; padding:12px 20px; border:0; border-radius:8px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar" id="chats"></div>
+    <div class="chat">
+      <div class="messages" id="messages">Select a chat</div>
+      <div class="input">
+        <input id="text" placeholder="Type as bot..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+let password = prompt("Admin password:");
+let selectedChatId = null;
+
+async function api(path, options = {}) {
+  options.headers = {
+    ...(options.headers || {}),
+    "x-admin-password": password,
+    "Content-Type": "application/json"
+  };
+  const res = await fetch(path, options);
+  return res.json();
+}
+
+async function loadChats() {
+  const data = await api("/api/admin/chats");
+  const box = document.getElementById("chats");
+  box.innerHTML = "";
+
+  data.chats.forEach(chat => {
+    const div = document.createElement("div");
+    div.className = "chat-item";
+    div.innerText = chat.chat_title || chat.chat_id;
+    div.onclick = () => {
+      selectedChatId = chat.chat_id;
+      loadMessages();
+    };
+    box.appendChild(div);
+  });
+}
+
+async function loadMessages() {
+  const data = await api("/api/admin/messages?chat_id=" + selectedChatId);
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+
+  data.messages.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "msg " + (m.is_bot ? "bot" : "");
+    div.innerHTML = "<b>" + (m.username || "User") + "</b><br>" + m.message_text;
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById("text");
+  const text = input.value.trim();
+  if (!selectedChatId || !text) return;
+
+  await api("/api/admin/send", {
+    method: "POST",
+    body: JSON.stringify({
+      chat_id: selectedChatId,
+      text
+    })
+  });
+
+  input.value = "";
+  loadMessages();
+}
+
+loadChats();
+setInterval(() => {
+  if (selectedChatId) loadMessages();
+}, 3000);
+</script>
+</body>
+</html>
