@@ -19,10 +19,12 @@ export async function getUserHistory(userId) {
     .order("created_at", { ascending: false })
     .limit(15);
 
-  return data
-    ?.reverse()
-    .map((m) => `${m.role === "bot" ? "Akash" : m.username}: ${m.message_text}`)
-    .join("\n") || "No previous conversation.";
+  return (
+    data
+      ?.reverse()
+      .map((m) => `${m.role === "bot" ? "Akash" : m.username}: ${m.message_text}`)
+      .join("\n") || "No previous conversation."
+  );
 }
 
 async function trimUserHistory(userId) {
