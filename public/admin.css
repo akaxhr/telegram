@@ -122,8 +122,9 @@ body {
 }
 
 .bubble {
-  max-width: 70%;
-  width: fit-content;
+  width: auto;
+  display: inline-block;
+  max-width: 500px;
   min-width: 120px;
   padding: 14px 16px;
   border-radius: 12px;
