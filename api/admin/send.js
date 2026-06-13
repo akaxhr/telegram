@@ -18,6 +18,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "chat_id and text required" });
   }
 
+  const { chat_id, text, reply_to_message_id } = req.body;
+  const result = await sendTelegram(chat_id, text, reply_to_message_id);
+
   const result = await sendTelegram(chat_id, text);
 
   await supabase.from("bot_messages").insert({
