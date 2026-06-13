@@ -8,21 +8,24 @@
   <div class="app">
     <div class="sidebar">
       <div class="sidebar-header">Akash Bot</div>
+
       <div class="sidebar-tools">
-      <input id="chatSearch" placeholder="Search chats/users..." oninput="loadChats()" />
+        <input id="chatSearch" placeholder="Search chats/users..." oninput="loadChats()" />
       </div>
+
       <div id="chats"></div>
     </div>
 
     <div class="main">
       <div class="topbar">
-  <span id="chatTitle">Select a chat</span>
-  <button class="danger" onclick="deleteChat()">Delete Chat</button>
-</div>
+        <span id="chatTitle">Select a chat</span>
+        <button class="danger" onclick="deleteChat()">Delete Chat</button>
+      </div>
 
-<div class="message-search">
-  <input id="messageSearch" placeholder="Search messages/users..." oninput="loadMessages()" />
-</div>
+      <div class="message-search">
+        <input id="messageSearch" placeholder="Search messages/users..." oninput="loadMessages()" />
+      </div>
+
       <div class="messages" id="messages">
         <div class="empty">No chat selected</div>
       </div>
@@ -33,9 +36,8 @@
       </div>
 
       <div class="input-bar">
-  <input id="targetChatId" placeholder="Target chat/user ID optional" />
-  <input id="text" placeholder="Type as Akash bot..." onkeydown="handleEnter(event)" />
-  <button onclick="sendMessage()">Send</button>
+        <input id="text" placeholder="Type as Akash bot..." onkeydown="handleEnter(event)" />
+        <button onclick="sendMessage()">Send</button>
       </div>
     </div>
   </div>
