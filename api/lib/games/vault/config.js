@@ -1,0 +1,6 @@
+export const VAULT_CONFIG = {
+  BASE_REWARD: 300,
+  MISS_COST: 10,
+  MAX_ATTEMPTS: 30,
+  CODE_LENGTH: 6,
+};
