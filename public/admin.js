@@ -164,14 +164,19 @@ async function sendMessage() {
     return;
   }
 
-  if (!text) return;
+ if (!text) return;
 
-  await api("/api/admin/send", {
+const replyPassword = prompt("Enter reply password:");
+
+if (!replyPassword) return;
+
+await api("/api/admin/send", {
     method: "POST",
     body: JSON.stringify({
       chat_id: selectedChatId,
       text,
-      reply_to_message_id: replyToMessageId
+      reply_to_message_id: replyToMessageId,
+      reply_password: replyPassword
     })
   });
 
