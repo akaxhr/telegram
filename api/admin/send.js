@@ -1,5 +1,5 @@
-import { supabase } from "../../lib/supabase.js";
-import { sendTelegram } from "../../lib/telegram.js";
+import { supabase } from "../lib/supabase.js";
+import { sendTelegram } from "../lib/telegram.js";
 
 export default async function handler(req, res) {
   const password = req.headers["x-admin-password"];
