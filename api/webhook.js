@@ -1,6 +1,6 @@
-import { generateWithFallback } from "../lib/ai.js";
-import { getMemories, saveMemory } from "../lib/memory.js";
-import { sendTelegram } from "../lib/telegram.js";
+import { generateWithFallback } from "./lib/ai.js";
+import { getMemories, saveMemory } from "./lib/memory.js";
+import { sendTelegram } from "./lib/telegram.js";
 
 const BOT_USERNAME = "akaxhr_bot";
 
