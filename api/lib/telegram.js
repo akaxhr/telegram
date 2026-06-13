@@ -1,6 +1,6 @@
 import { saveMessage } from "./messages.js";
 
-export async function sendTelegram(chatId, text, replyTo = null) {
+export async function sendTelegram(chatId, text, replyTo = null, chatTitle = "Bot Reply") {
   const body = {
     chat_id: chatId,
     text,
@@ -21,9 +21,14 @@ export async function sendTelegram(chatId, text, replyTo = null) {
 
   const result = await res.json();
 
+  if (!result.ok) {
+    console.error("Telegram send error:", result);
+    return result;
+  }
+
   await saveMessage({
     chat_id: String(chatId),
-    chat_title: "Bot Reply",
+    chat_title: chatTitle,
     user_id: "bot",
     username: "Akash",
     message_text: text,
