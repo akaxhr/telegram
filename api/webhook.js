@@ -26,10 +26,17 @@ export default async function handler(req, res) {
 
     await saveMessage({
   chat_id: String(chatId),
-  chat_title: message.chat.title || message.chat.first_name || "Private Chat",
+  chat_title:
+    message.chat.title ||
+    message.chat.first_name ||
+    message.chat.username ||
+    "Private Chat",
+  chat_type: message.chat.type,
   user_id: userId,
   username: userName,
   message_text: text,
+  telegram_message_id: message.message_id,
+  reply_to_message_id: message.reply_to_message?.message_id || null,
   is_bot: false,
 });
 
