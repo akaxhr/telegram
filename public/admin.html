@@ -3,35 +3,180 @@
 <head>
   <title>Akash Bot Panel</title>
   <style>
-    body { margin:0; font-family:Arial; background:#111; color:white; }
-    .app { display:flex; height:100vh; }
-    .sidebar { width:280px; background:#1e1e1e; overflow:auto; }
-    .chat { flex:1; display:flex; flex-direction:column; }
-    .chat-item { padding:15px; border-bottom:1px solid #333; cursor:pointer; }
-    .chat-item:hover { background:#333; }
-    .messages { flex:1; padding:20px; overflow:auto; }
-    .msg { margin:8px 0; padding:10px; border-radius:10px; max-width:70%; background:#333; }
-    .bot { margin-left:auto; background:#245c3a; }
-    .input { display:flex; padding:10px; background:#1e1e1e; }
-    input { flex:1; padding:12px; border-radius:8px; border:0; }
-    button { margin-left:8px; padding:12px 20px; border:0; border-radius:8px; cursor:pointer; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 320px;
+      background: #111827;
+      border-right: 1px solid #334155;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+      background: #020617;
+      border-bottom: 1px solid #334155;
+    }
+
+    .chat-item {
+      padding: 14px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    .chat-item:hover,
+    .chat-item.active {
+      background: #1e293b;
+    }
+
+    .chat-title {
+      font-weight: bold;
+    }
+
+    .chat-time {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0f172a;
+    }
+
+    .topbar {
+      padding: 16px;
+      background: #020617;
+      border-bottom: 1px solid #334155;
+      font-weight: bold;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .message-row.bot {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 70%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #1e293b;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .bot .bubble {
+      background: #166534;
+    }
+
+    .sender {
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .time {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .input-bar {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: #020617;
+      border-top: 1px solid #334155;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .empty {
+      color: #94a3b8;
+      text-align: center;
+      margin-top: 40px;
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="sidebar" id="chats"></div>
-    <div class="chat">
-      <div class="messages" id="messages">Select a chat</div>
-      <div class="input">
-        <input id="text" placeholder="Type as bot..." />
+    <div class="sidebar">
+      <div class="sidebar-header">Akash Bot</div>
+      <div id="chats"></div>
+    </div>
+
+    <div class="main">
+      <div class="topbar" id="chatTitle">Select a chat</div>
+      <div class="messages" id="messages">
+        <div class="empty">No chat selected</div>
+      </div>
+
+      <div class="input-bar">
+        <input id="text" placeholder="Type as Akash bot..." onkeydown="handleEnter(event)" />
         <button onclick="sendMessage()">Send</button>
       </div>
     </div>
   </div>
 
 <script>
-let password = prompt("Admin password:");
+let password = localStorage.getItem("admin_password");
+
+if (!password) {
+  password = prompt("Admin password:");
+  localStorage.setItem("admin_password", password);
+}
+
 let selectedChatId = null;
+let selectedChatTitle = null;
 
 async function api(path, options = {}) {
   options.headers = {
@@ -39,37 +184,90 @@ async function api(path, options = {}) {
     "x-admin-password": password,
     "Content-Type": "application/json"
   };
+
   const res = await fetch(path, options);
+
+  if (res.status === 401) {
+    localStorage.removeItem("admin_password");
+    alert("Wrong admin password. Refresh and try again.");
+    throw new Error("Unauthorized");
+  }
+
   return res.json();
+}
+
+function formatTime(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleString();
+}
+
+function escapeHtml(text) {
+  return String(text || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }
 
 async function loadChats() {
   const data = await api("/api/admin/chats");
+
   const box = document.getElementById("chats");
   box.innerHTML = "";
+
+  if (!data.chats || data.chats.length === 0) {
+    box.innerHTML = `<div class="empty">No chats yet</div>`;
+    return;
+  }
 
   data.chats.forEach(chat => {
     const div = document.createElement("div");
     div.className = "chat-item";
-    div.innerText = chat.chat_title || chat.chat_id;
+    if (String(chat.chat_id) === String(selectedChatId)) {
+      div.classList.add("active");
+    }
+
+    div.innerHTML = `
+      <div class="chat-title">${escapeHtml(chat.chat_title || chat.chat_id)}</div>
+      <div class="chat-time">${formatTime(chat.created_at)}</div>
+    `;
+
     div.onclick = () => {
       selectedChatId = chat.chat_id;
+      selectedChatTitle = chat.chat_title || chat.chat_id;
+      document.getElementById("chatTitle").innerText = selectedChatTitle;
       loadMessages();
+      loadChats();
     };
+
     box.appendChild(div);
   });
 }
 
 async function loadMessages() {
-  const data = await api("/api/admin/messages?chat_id=" + selectedChatId);
+  if (!selectedChatId) return;
+
+  const data = await api("/api/admin/messages?chat_id=" + encodeURIComponent(selectedChatId));
   const box = document.getElementById("messages");
   box.innerHTML = "";
 
+  if (!data.messages || data.messages.length === 0) {
+    box.innerHTML = `<div class="empty">No messages yet</div>`;
+    return;
+  }
+
   data.messages.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "msg " + (m.is_bot ? "bot" : "");
-    div.innerHTML = "<b>" + (m.username || "User") + "</b><br>" + m.message_text;
-    box.appendChild(div);
+    const row = document.createElement("div");
+    row.className = "message-row " + (m.is_bot ? "bot" : "");
+
+    row.innerHTML = `
+      <div class="bubble">
+        <div class="sender">${escapeHtml(m.username || (m.is_bot ? "Akash" : "User"))}</div>
+        <div>${escapeHtml(m.message_text)}</div>
+        <div class="time">${formatTime(m.created_at)}</div>
+      </div>
+    `;
+
+    box.appendChild(row);
   });
 
   box.scrollTop = box.scrollHeight;
@@ -78,7 +276,13 @@ async function loadMessages() {
 async function sendMessage() {
   const input = document.getElementById("text");
   const text = input.value.trim();
-  if (!selectedChatId || !text) return;
+
+  if (!selectedChatId) {
+    alert("Select a chat first");
+    return;
+  }
+
+  if (!text) return;
 
   await api("/api/admin/send", {
     method: "POST",
@@ -89,11 +293,20 @@ async function sendMessage() {
   });
 
   input.value = "";
-  loadMessages();
+  await loadMessages();
+  await loadChats();
+}
+
+function handleEnter(event) {
+  if (event.key === "Enter") {
+    sendMessage();
+  }
 }
 
 loadChats();
+
 setInterval(() => {
+  loadChats();
   if (selectedChatId) loadMessages();
 }, 3000);
 </script>
