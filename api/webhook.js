@@ -221,8 +221,6 @@ so reply accordingly keep it natural..
 Recent conversation with this user:
 ${memoryText}
 
-${wordGameHint}
-
 User message:
 ${cleanText}
       `;
