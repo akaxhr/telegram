@@ -22,14 +22,24 @@ async function saveGroupSettings() {
     return;
   }
 
+  const settingsPassword = prompt("Enter settings password:");
+
+  if (!settingsPassword) {
+    await loadGroupSettings();
+    return;
+  }
+
   await api("/api/admin/group-settings", {
     method: "POST",
     body: JSON.stringify({
       chat_id: selectedChatId,
       vault_enabled: document.getElementById("vaultToggle").checked,
       ai_enabled: document.getElementById("aiToggle").checked,
+      settings_password: settingsPassword
     }),
   });
+
+  await loadGroupSettings();
 }
 
 async function trackPanelVisit() {
