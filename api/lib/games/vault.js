@@ -112,7 +112,9 @@ export async function startVault(chatId, mode = "normal") {
     .maybeSingle();
 
   if (existing) {
-    return "⚠️ A vault is already active in this group.\n\nUse a 6-digit code to attempt breach.";
+   return `⚠️ A vault is already active in this group.
+
+Use a ${existing.secret_code.length}-digit code to attempt breach.`;
   }
 
   const secret = randomCode(difficulty.length);
@@ -163,6 +165,10 @@ export async function handleVaultGuess(chatId, userId, username, guess) {
   if (!game) return null;
 
 const codeLength = game.secret_code.length;
+const difficulty = getDifficulty(game.difficulty || "normal");
+const BASE_REWARD = difficulty.reward;
+const MISS_COST = difficulty.missCost;
+  
 const guessRegex = new RegExp(`^\\d{${codeLength}}$`);
 if (!guessRegex.test(guess)) return null;
 
