@@ -75,6 +75,27 @@ if (lowerText === "/unlockboard") {
   return res.status(200).json({ ok: true });
 }
 
+if (lowerText === "/profile") {
+  if (!settings.vault_enabled) {
+    return res.status(200).json({ ok: true });
+  }
+
+  const reply = await vaultProfile(userId, displayName);
+
+  await sendTelegram(
+    chatId,
+    reply,
+    message.message_id,
+    message.chat.title ||
+      message.chat.first_name ||
+      message.chat.username ||
+      "Private Chat",
+    message.chat.type
+  );
+
+  return res.status(200).json({ ok: true });
+}
+
 // vault guesses
 if (settings.vault_enabled) {
   const vaultReply = await handleVaultGuess(
