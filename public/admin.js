@@ -290,7 +290,7 @@ function handleEnter(event) {
 
 loadChats();
 trackPanelVisit();
-
+loadGroupSettings();
 setInterval(() => {
   loadChats();
   if (selectedChatId) loadMessages();
