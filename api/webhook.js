@@ -32,12 +32,12 @@ export default async function handler(req, res) {
 
 
 // /vault command
-if (lowerText === "/vault") {
+if (lowerText.startsWith("/vault")) {
   if (!settings.vault_enabled) {
     return res.status(200).json({ ok: true });
   }
-
-  const reply = await startVault(chatId);
+  const mode = lowerText.split(" ")[1] || "normal";
+  const reply = await startVault(chatId, mode);
 
   await sendTelegram(
     chatId,
