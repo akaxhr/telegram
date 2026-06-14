@@ -130,6 +130,12 @@ await saveMessage({
   return res.status(200).json({ ok: true });
 }
 
+      const memoryText = await getUserHistory(userId);
+    const lastMessages = memoryText
+  .split("\n")
+  .slice(-4)
+  .map(line => line.split(":").pop().trim());
+
 const shouldReply =
   isPrivateChat ||
   text.startsWith("/akash") ||
