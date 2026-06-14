@@ -206,7 +206,7 @@ const replyPassword = prompt("Enter reply password:");
 
 if (!replyPassword) return;
 
-await api("/api/admin/send", {
+await api("/api/admin/messages", {
     method: "POST",
     body: JSON.stringify({
       chat_id: selectedChatId,
