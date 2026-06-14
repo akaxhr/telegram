@@ -31,6 +31,51 @@ export default async function handler(req, res) {
     const lowerText = text.toLowerCase();
 
 
+// /vault command
+if (lowerText === "/vault") {
+  if (!settings.vault_enabled) {
+    return res.status(200).json({ ok: true });
+  }
+
+  const reply = await startVault(chatId);
+
+  await sendTelegram(
+    chatId,
+    reply,
+    message.message_id,
+    message.chat.title ||
+      message.chat.first_name ||
+      message.chat.username ||
+      "Private Chat",
+    message.chat.type
+  );
+
+  return res.status(200).json({ ok: true });
+}
+
+// /vaultboard command
+if (lowerText === "/vaultboard") {
+  if (!settings.vault_enabled) {
+    return res.status(200).json({ ok: true });
+  }
+
+  const reply = await vaultLeaderboard();
+
+  await sendTelegram(
+    chatId,
+    reply,
+    message.message_id,
+    message.chat.title ||
+      message.chat.first_name ||
+      message.chat.username ||
+      "Private Chat",
+    message.chat.type
+  );
+
+  return res.status(200).json({ ok: true });
+}
+
+// vault guesses
 if (settings.vault_enabled) {
   const vaultReply = await handleVaultGuess(
     chatId,
@@ -55,49 +100,8 @@ if (settings.vault_enabled) {
   }
 }
 
-if (lowerText === "/vaultboard") {
-  const reply = await vaultLeaderboard();
-
-  await sendTelegram(
-    chatId,
-    reply,
-    message.message_id,
-    message.chat.title ||
-      message.chat.first_name ||
-      message.chat.username ||
-      "Private Chat",
-    message.chat.type
-  );
-
-  return res.status(200).json({ ok: true });
-}
-
-if (settings.vault_enabled) {
-  const vaultReply = await handleVaultGuess(
-    chatId,
-    userId,
-    displayName,
-    text
-  );
-
-  if (vaultReply) {
-  await sendTelegram(
-    chatId,
-    vaultReply,
-    message.message_id,
-    message.chat.title ||
-      message.chat.first_name ||
-      message.chat.username ||
-      "Private Chat",
-    message.chat.type
-  );
-
-  return res.status(200).json({ ok: true });
-}
-
-  
-
-    await saveMessage({
+// save message AFTER vault block
+await saveMessage({
   chat_id: String(chatId),
   chat_title:
     message.chat.title ||
