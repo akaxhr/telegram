@@ -255,10 +255,11 @@ body {
   border-top: 1px solid var(--border);
 }
 
-.input-bar input {
-  flex: 1;
+
+  
 
 input {
+  flex: 1;
   padding: 11px 14px;
   border-radius: 999px;
   border: none;
