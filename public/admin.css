@@ -255,8 +255,10 @@ body {
   border-top: 1px solid var(--border);
 }
 
-input {
+.input-bar input {
   flex: 1;
+
+input {
   padding: 11px 14px;
   border-radius: 999px;
   border: none;
@@ -387,6 +389,15 @@ button:hover {
 .danger {
   min-width: 64px;
   padding: 8px 10px;
+}
+.sidebar-tools input,
+.message-search input {
+  width: 100%;
+  flex: none;
+}
+
+.switch-label input {
+  display: none;
 }
 /* MOBILE */
 
