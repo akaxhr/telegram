@@ -314,18 +314,41 @@ button:hover {
   background: transparent;
 }
 
-.topbar-actions {
+.topbar {
+  height: 54px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  background: var(--topbar);
+  color: white;
+  overflow: hidden;
+}
+
+.chat-title-top {
+  min-width: 0;
+  flex: 1;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .switch-label {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   font-size: 13px;
-  cursor: pointer;
+  white-space: nowrap;
 }
 
 .switch-label input {
@@ -333,7 +356,7 @@ button:hover {
 }
 
 .switch {
-  width: 42px;
+  width: 40px;
   height: 22px;
   background: #555;
   border-radius: 999px;
@@ -358,9 +381,13 @@ button:hover {
 }
 
 .switch-label input:checked + .switch::before {
-  left: 22px;
+  left: 20px;
 }
 
+.danger {
+  min-width: 64px;
+  padding: 8px 10px;
+}
 /* MOBILE */
 
 @media (max-width: 768px) {
