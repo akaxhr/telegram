@@ -306,15 +306,21 @@ The vault has vanished into the shadows.`;
   }
 
   const status = revealCode(game.secret_code, revealed);
+  const stats = getMatchStats(game.secret_code, guess);
 
   const clueText =
     newWrongAttempts % 5 === 0
       ? `\n📡 Intelligence Fragment Recovered\nCode Status:\n${status}\n`
       : `\nCode Status:\n${status}\n`;
 
-  return `❌ ACCESS DENIED
+ return `❌ ACCESS DENIED
 
-${username} dropped 💸 10 coins into the vault drain.
+${username} dropped 💸 ${MISS_COST} coins into the vault drain.
+
+🔍 Vault Scan:
+🟩 Correct Position: ${stats.correctPosition}/${codeLength}
+🟨 Correct Digit, Wrong Place: ${stats.correctDigitWrongPlace}
+⬛ Not In Code: ${stats.wrongDigits}
 
 ${clueText}
 ❤️ Attempts Left: ${newAttemptsLeft}
