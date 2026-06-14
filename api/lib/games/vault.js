@@ -1,10 +1,48 @@
 import { supabase } from "../supabase.js";
 
-const BASE_REWARD = 300;
-const MISS_COST = 10;
+// modes of difficulty
 
-function randomCode() {
-  return String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
+const DIFFICULTIES = {
+  easy: {
+    name: "🟢 EASY VAULT",
+    length: 6,
+    reward: 300,
+    missCost: 10,
+  },
+  normal: {
+    name: "🔵 NORMAL VAULT",
+    length: 8,
+    reward: 600,
+    missCost: 10,
+  },
+  legendary: {
+    name: "🟣 LEGENDARY VAULT",
+    length: 16,
+    reward: 1500,
+    missCost: 15,
+  },
+  ultra: {
+    name: "🔥 ULTRA VAULT",
+    length: 20,
+    reward: 2500,
+    missCost: 20,
+  },
+};
+
+function getDifficulty(mode = "normal") {
+  return DIFFICULTIES[mode] || DIFFICULTIES.normal;
+}
+
+// code generating
+
+function randomCode(length) {
+  let code = "";
+
+  for (let i = 0; i < length; i++) {
+    code += Math.floor(Math.random() * 10);
+  }
+
+  return code;
 }
 
 function revealCode(secret, positions) {
@@ -64,7 +102,8 @@ async function getOrCreatePlayer(userId, username) {
   return created;
 }
 
-export async function startVault(chatId) {
+export async function startVault(chatId, mode = "normal") {
+  const difficulty = getDifficulty(mode);
   const { data: existing } = await supabase
     .from("vault_games")
     .select("*")
@@ -76,11 +115,12 @@ export async function startVault(chatId) {
     return "⚠️ A vault is already active in this group.\n\nUse a 6-digit code to attempt breach.";
   }
 
-  const secret = randomCode();
+  const secret = randomCode(difficulty.length);
 
   await supabase.from("vault_games").insert({
     chat_id: String(chatId),
     secret_code: secret,
+    difficulty: mode,
     attempts_left: 30,
     wrong_attempts: 0,
     revealed_positions: [],
@@ -92,24 +132,24 @@ export async function startVault(chatId) {
 A classified digital vault has appeared.
 
 CODE FORMAT
-● 6 Digits
+● ${difficulty.length} Digits
 ● 000000 - 999999
 
 VAULT REWARD
-💰 300 Coins
+💰 ${difficulty.reward} Coins
 
 BREACH LIMIT
 ❤️ 30 Attempts
 
 BREACH COST
-💸 -10 Coins per failed attempt
+💸 -${difficulty.missCost} Coins per failed attempt
 
 Current Code Status:
-_ _ _ _ _ _
+${"_ ".repeat(difficulty.length).trim()}
 
 First operative to breach the vault claims the reward.
 
-Enter a 6-digit code...`;
+Enter a ${difficulty.length}-digit code...`;
 }
 
 export async function handleVaultGuess(chatId, userId, username, guess) {
