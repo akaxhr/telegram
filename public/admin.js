@@ -5,6 +5,33 @@ if (!password) {
   sessionStorage.setItem("admin_password", password);
 }
 
+async function loadGroupSettings() {
+  if (!selectedChatId) return;
+
+  const data = await api(
+    "/api/admin/group-settings?chat_id=" + encodeURIComponent(selectedChatId)
+  );
+
+  document.getElementById("vaultToggle").checked = data.vault_enabled;
+  document.getElementById("aiToggle").checked = data.ai_enabled;
+}
+
+async function saveGroupSettings() {
+  if (!selectedChatId) {
+    alert("Select a chat first");
+    return;
+  }
+
+  await api("/api/admin/group-settings", {
+    method: "POST",
+    body: JSON.stringify({
+      chat_id: selectedChatId,
+      vault_enabled: document.getElementById("vaultToggle").checked,
+      ai_enabled: document.getElementById("aiToggle").checked,
+    }),
+  });
+}
+
 async function trackPanelVisit() {
   let visitorId = localStorage.getItem("panel_visitor_id");
 
