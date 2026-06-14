@@ -31,24 +31,28 @@ export default async function handler(req, res) {
     const lowerText = text.toLowerCase();
 
 
-if (lowerText === "/vault") {
-  if (!settings.vault_enabled) {
-    return res.status(200).json({ ok: true });
-  }
-  const reply = await startVault(chatId);
-
-  await sendTelegram(
+if (settings.vault_enabled) {
+  const vaultReply = await handleVaultGuess(
     chatId,
-    reply,
-    message.message_id,
-    message.chat.title ||
-      message.chat.first_name ||
-      message.chat.username ||
-      "Private Chat",
-    message.chat.type
+    userId,
+    displayName,
+    text
   );
 
-  return res.status(200).json({ ok: true });
+  if (vaultReply) {
+    await sendTelegram(
+      chatId,
+      vaultReply,
+      message.message_id,
+      message.chat.title ||
+        message.chat.first_name ||
+        message.chat.username ||
+        "Private Chat",
+      message.chat.type
+    );
+
+    return res.status(200).json({ ok: true });
+  }
 }
 
 if (lowerText === "/vaultboard") {
