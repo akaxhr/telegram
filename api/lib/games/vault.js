@@ -437,3 +437,24 @@ export async function vaultLeaderboard() {
 🔥 Best Streak: ${p.best_streak || 0}`;
   }).join("\n\n");
 }
+
+export async function vaultProfile(userId, username) {
+  const player = await getOrCreatePlayer(userId, username);
+
+  const badges = [
+    getWinBadge(player.wins),
+    getCoinBadge(player.coins),
+  ].filter(Boolean).join(" ");
+
+  return `👤 VAULT PROFILE
+
+${player.username || username}
+
+🏅 Badges:
+${badges || "No badges yet"}
+
+💰 Coins: ${player.coins}
+🔓 Vault Breaches: ${player.wins}
+🔥 Current Streak: ${player.current_streak || 0}
+⚡ Best Streak: ${player.best_streak || 0}`;
+}
