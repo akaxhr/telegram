@@ -21,18 +21,21 @@
   <span id="chatTitle">Select a chat</span>
 
   <div class="topbar-actions">
-    <label>
+    <label class="switch-label">
+      <span>Vault</span>
       <input type="checkbox" id="vaultToggle" onchange="saveGroupSettings()" />
-      Vault
+      <span class="switch"></span>
     </label>
 
-    <label>
+    <label class="switch-label">
+      <span>AI</span>
       <input type="checkbox" id="aiToggle" onchange="saveGroupSettings()" />
-      AI
+      <span class="switch"></span>
     </label>
 
     <button class="danger" onclick="deleteChat()">Delete Chat</button>
   </div>
+</div>
 </div>
 
       <div class="message-search">
