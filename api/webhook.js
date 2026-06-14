@@ -133,7 +133,11 @@ const shouldReply =
   lowerText.includes(`@${BOT_USERNAME}`) ||
   lowerText.startsWith("remember") ||
   isReplyToBot;
-    if (!settings.ai_enabled) {
+    if (!shouldReply) {
+  return res.status(200).json({ ok: true });
+}
+
+if (!settings.ai_enabled) {
   return res.status(200).json({ ok: true });
 }
 
