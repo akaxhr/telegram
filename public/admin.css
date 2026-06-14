@@ -390,15 +390,7 @@ button:hover {
   min-width: 64px;
   padding: 8px 10px;
 }
-.sidebar-tools input,
-.message-search input {
-  width: 100%;
-  flex: none;
-}
 
-.switch-label input {
-  display: none;
-}
 /* MOBILE */
 
 @media (max-width: 768px) {
