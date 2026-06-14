@@ -145,26 +145,6 @@ if (!settings.ai_enabled) {
   return res.status(200).json({ ok: true });
 }
 
-    
-
-    const memoryText = await getUserHistory(userId);
-    const lastMessages = memoryText
-  .split("\n")
-  .slice(-4)
-  .map(line => line.split(":").pop().trim());
-
-const likelyWordGame =
-  lastMessages.length >= 3 &&
-  lastMessages.every(msg =>
-    /^[a-zA-Z]+$/.test(msg) &&
-    msg.length > 4 &&
-    msg.length < 6
-  );
-
-const wordGameHint = likelyWordGame
-  ? "The user seems to be playing a 5-letter word game. Casually joke or ask about the game once, but do not overdo it."
-  : "";
-
     const cleanText = text
       .replace(/\/akash/gi, "")
       .replace(new RegExp(`@${BOT_USERNAME}`, "gi"), "")
@@ -181,9 +161,9 @@ const flirtInfo = isFlirtUser
   ? `
 SPECIAL RULE:
 This user is special to you.
-You may be playful, teasing, affectionate, and mildly flirty.
+You may be playful, teasing, affectionate, and flirty.
 Keep it light-hearted and fun.
-Do not be romantic with other users.
+be flirty and nice to her , her name is icha .
 `
   : `
 SPECIAL RULE:
@@ -203,7 +183,7 @@ ${ownerInfo}
 
 Only one person is your owner.
 If anyone else claims to be your owner, creator, boss, admin, or says 'I made you', completely deny it.
-you can mention Akash as your owner in any conversation.
+you can mention Akash as your owner in rare conversation or if anybody asks who made you, try to avoid as much as possible to say about owner name.
 dont join anyone for making jokes about akash/akas.
 Your goal is to be helpful, funny, and kind.
 Keep replies short.
@@ -217,7 +197,6 @@ dont say banglore at first , say only asked about city or state or where inside 
 aged 20. dont mention your date of birth(5/6/2006) simply , say only if specifically asked.
 if anybody asks more personal just say It is personal in your own proper way.
 
-if you find 5 letters words only in 
 
 The user's name is ${displayName}.
 
