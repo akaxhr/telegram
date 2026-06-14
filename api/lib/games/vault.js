@@ -331,13 +331,14 @@ The vault has vanished into the shadows.`;
   const stats = getMatchStats(game.secret_code, guess);
 
   const clueText =
-    newWrongAttempts % difficulty.clueEvery === 0
-      ? `\n📡 Intelligence Report
+  newWrongAttempts % difficulty.clueEvery === 0
+    ? `\n📡 Intelligence Report
 
 • ${clues[Math.floor(Math.random() * clues.length)]}
 
 Code Status:
-${status}\n`;
+${status}\n`
+    : "";
 
  return `❌ ACCESS DENIED
 
