@@ -106,10 +106,16 @@ if (vaultReply) {
     await saveUserHistory(userId, userName, "user", text);
 
     const isReplyToBot =
-      message.reply_to_message?.from?.username?.toLowerCase() === BOT_USERNAME ||
-      message.reply_to_message?.from?.is_bot === true;
+    const BOT_ID = 8847459711; // your bot numeric id
+
+    const isReplyToBot =
+    message.reply_to_message?.from?.id === BOT_ID;
 
     const isPrivateChat = message.chat.type === "private";
+
+    if (message.reply_to_message?.sender_chat && !message.reply_to_message?.from) {
+  return res.status(200).json({ ok: true });
+}
 
 const shouldReply =
   isPrivateChat ||
