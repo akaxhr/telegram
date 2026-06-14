@@ -262,6 +262,7 @@ function handleEnter(event) {
 }
 
 loadChats();
+trackPanelVisit();
 
 setInterval(() => {
   loadChats();
