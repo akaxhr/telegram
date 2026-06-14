@@ -61,7 +61,23 @@ async function api(path, options = {}) {
 
 
 
-  return res.json();
+  const raw = await res.text();
+console.log("API raw response:", raw);
+
+let data;
+try {
+  data = JSON.parse(raw);
+} catch {
+  data = { error: raw };
+}
+
+if (!res.ok) {
+  console.error("API error:", res.status, data);
+  alert(data.error || raw);
+  throw new Error(data.error || "API failed");
+}
+
+return data;
 }
 
 function formatTime(value) {
