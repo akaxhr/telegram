@@ -54,6 +54,21 @@ function getDifficulty(mode = "normal") {
   return DIFFICULTIES[mode] || DIFFICULTIES.normal;
 }
 
+function randomFailNarration() {
+  const lines = [
+    "🔐 Security layer held strong.",
+    "🚫 Access sequence rejected.",
+    "💀 The vault laughed at that attempt.",
+    "🤖 Authentication failed.",
+    "⚠️ Incorrect breach code detected.",
+    "🧊 The vault stayed cold and silent.",
+    "📛 Security firewall refused entry.",
+    "😵 That code got swallowed by the vault."
+  ];
+
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
 // code generating
 
 function randomCode(length) {
@@ -368,6 +383,7 @@ ${status}\n`
 ${status}\n`;
 
  return `❌ ACCESS DENIED
+${randomFailNarration()}
 
 ${username} dropped 💸 ${MISS_COST} coins into the vault drain.
 
