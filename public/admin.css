@@ -314,6 +314,19 @@ button:hover {
   background: transparent;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-actions label {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 /* MOBILE */
 
 @media (max-width: 768px) {
@@ -333,3 +346,5 @@ button:hover {
     padding: 0 12px;
   }
 }
+
+
