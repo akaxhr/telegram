@@ -2,7 +2,7 @@ import { generateWithFallback } from "./lib/ai.js";
 import { getUserHistory, saveUserHistory } from "./lib/memory.js";
 import { sendTelegram } from "./lib/telegram.js";
 import { saveMessage } from "./lib/messages.js";
-import { getDisplayName } from "./lib/aliases.js";
+import { getDisplayName, getGroupSettings } from "./lib/aliases.js";
 import { startVault, handleVaultGuess, vaultLeaderboard } from "./lib/games/vault.js";
 
 const BOT_USERNAME = "akaxhr_bot";
