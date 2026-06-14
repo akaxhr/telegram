@@ -54,7 +54,7 @@ if (lowerText.startsWith("/vault")) {
 }
 
 // /vaultboard command
-if (lowerText === "/vaultboard") {
+if (lowerText === "/unlockboard") {
   if (!settings.vault_enabled) {
     return res.status(200).json({ ok: true });
   }
