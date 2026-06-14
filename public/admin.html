@@ -17,10 +17,23 @@
     </div>
 
     <div class="main">
-      <div class="topbar">
-        <span id="chatTitle">Select a chat</span>
-        <button class="danger" onclick="deleteChat()">Delete Chat</button>
-      </div>
+     <div class="topbar">
+  <span id="chatTitle">Select a chat</span>
+
+  <div class="topbar-actions">
+    <label>
+      <input type="checkbox" id="vaultToggle" onchange="saveGroupSettings()" />
+      Vault
+    </label>
+
+    <label>
+      <input type="checkbox" id="aiToggle" onchange="saveGroupSettings()" />
+      AI
+    </label>
+
+    <button class="danger" onclick="deleteChat()">Delete Chat</button>
+  </div>
+</div>
 
       <div class="message-search">
         <input id="messageSearch" placeholder="Search messages/users..." oninput="loadMessages()" />
