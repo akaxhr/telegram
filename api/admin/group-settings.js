@@ -27,6 +27,9 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
+    if (req.body.settings_password !== process.env.SETTINGS_PASSWORD) {
+  return res.status(403).json({ error: "Wrong settings password" });
+}
     const {
       chat_id,
       vault_enabled,
