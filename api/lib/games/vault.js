@@ -162,7 +162,9 @@ export async function handleVaultGuess(chatId, userId, username, guess) {
 
   if (!game) return null;
 
-  if (!/^\d{6}$/.test(guess)) return null;
+const codeLength = game.secret_code.length;
+const guessRegex = new RegExp(`^\\d{${codeLength}}$`);
+if (!guessRegex.test(guess)) return null;
 
   const player = await getOrCreatePlayer(userId, username);
 
@@ -227,8 +229,9 @@ ${badges || "🔓 Codebreaker"}`;
 
   let revealed = game.revealed_positions || [];
 
-  if (newWrongAttempts % 5 === 0 && revealed.length < 5) {
-    const hidden = [0, 1, 2, 3, 4, 5].filter(i => !revealed.includes(i));
+  if (newWrongAttempts % 5 === 0 && revealed.length < codeLength - 1) {
+    const hidden = Array.from({ length: codeLength }, (_, i) => i)
+  .filter(i => !revealed.includes(i));
     const pos = hidden[Math.floor(Math.random() * hidden.length)];
     revealed.push(pos);
   }
