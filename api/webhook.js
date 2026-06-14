@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     const lowerText = text.toLowerCase();
 
 
-    if (lowerText === "/vault") {
+ if (lowerText === "/vault") {
   const reply = await startVault(chatId);
 
   await sendTelegram(
