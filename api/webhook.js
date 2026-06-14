@@ -3,7 +3,7 @@ import { getUserHistory, saveUserHistory } from "./lib/memory.js";
 import { sendTelegram } from "./lib/telegram.js";
 import { saveMessage } from "./lib/messages.js";
 import { getDisplayName, getGroupSettings } from "./lib/aliases.js";
-import { startVault, handleVaultGuess, vaultLeaderboard } from "./lib/games/vault.js";
+import { startVault, handleVaultGuess, vaultLeaderboard, vaultProfile } from "./lib/games/vault.js";
 
 const BOT_USERNAME = "akaxhr_bot";
 
