@@ -21,6 +21,7 @@ export default async function handler(req, res) {
     }
 
     const chatId = message.chat.id;
+    const settings = await getGroupSettings(chatId);
     const userId = String(message.from.id);
     const OWNER_ID = "8348549970";
     const isOwner = userId === OWNER_ID;
@@ -30,7 +31,10 @@ export default async function handler(req, res) {
     const lowerText = text.toLowerCase();
 
 
- if (lowerText === "/vault") {
+if (lowerText === "/vault") {
+  if (!settings.vault_enabled) {
+    return res.status(200).json({ ok: true });
+  }
   const reply = await startVault(chatId);
 
   await sendTelegram(
@@ -64,14 +68,15 @@ if (lowerText === "/vaultboard") {
   return res.status(200).json({ ok: true });
 }
 
-const vaultReply = await handleVaultGuess(
-  chatId,
-  userId,
-  displayName,
-  text
-);
+if (settings.vault_enabled) {
+  const vaultReply = await handleVaultGuess(
+    chatId,
+    userId,
+    displayName,
+    text
+  );
 
-if (vaultReply) {
+  if (vaultReply) {
   await sendTelegram(
     chatId,
     vaultReply,
@@ -124,9 +129,9 @@ const shouldReply =
   lowerText.includes(`@${BOT_USERNAME}`) ||
   lowerText.startsWith("remember") ||
   isReplyToBot;
-    if (!shouldReply) {
-      return res.status(200).json({ ok: true });
-    }
+    if (!settings.ai_enabled) {
+  return res.status(200).json({ ok: true });
+}
 
     
 
