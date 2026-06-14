@@ -303,18 +303,7 @@ ${badges || "🔓 Codebreaker"}`;
     revealed.push(pos);
   }
 
-  await supabase
-  .from("vault_games")
-  .update({
-    attempts_left: newAttemptsLeft,
-    wrong_attempts: newWrongAttempts,
-    revealed_positions: revealed,
-    used_clues:
-      newWrongAttempts % difficulty.clueEvery === 0
-        ? [...usedClues, selectedClue]
-        : usedClues
-  })
-    .eq("id", game.id);
+  
 
   if (newAttemptsLeft <= 0) {
     await supabase
@@ -331,20 +320,40 @@ The hidden code was: ${game.secret_code}
 The vault has vanished into the shadows.`;
   }
 
-  const status = revealCode(game.secret_code, revealed);
-  
   const clues = generateClues(game.secret_code);
-  let usedClues = game.used_clues || [];
-let availableClues = clues.filter(clue => !usedClues.includes(clue));
+let usedClues = game.used_clues || [];
+let selectedClue = "";
 
-if (availableClues.length === 0) {
-  availableClues = clues;
-  usedClues = [];
+if (newWrongAttempts % difficulty.clueEvery === 0) {
+  let availableClues = clues.filter(
+    clue => !usedClues.includes(clue)
+  );
+
+  if (availableClues.length === 0) {
+    availableClues = clues;
+    usedClues = [];
+  }
+
+  selectedClue =
+    availableClues[Math.floor(Math.random() * availableClues.length)];
+
+  usedClues = [...usedClues, selectedClue];
 }
 
-const selectedClue =
-  availableClues[Math.floor(Math.random() * availableClues.length)];
-  
+await supabase
+  .from("vault_games")
+  .update({
+    attempts_left: newAttemptsLeft,
+    wrong_attempts: newWrongAttempts,
+    revealed_positions: revealed,
+    used_clues:
+      newWrongAttempts % difficulty.clueEvery === 0
+        ? [...usedClues, selectedClue]
+        : usedClues
+  })
+    .eq("id", game.id);
+  const status = revealCode(game.secret_code, revealed);
+    
   const stats = getMatchStats(game.secret_code, guess);
 
  const clueText =
