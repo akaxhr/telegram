@@ -1,34 +1,55 @@
 import { supabase } from "../supabase.js";
 
+function generateClues(secret) {
+  const digits = secret.split("").map(Number);
+
+  return [
+    `Digit sum is ${digits.reduce((a, b) => a + b, 0)}`,
+    `Contains ${digits.filter(d => d % 2 === 0).length} even digits`,
+    `Contains ${digits.filter(d => d % 2 !== 0).length} odd digits`,
+    `Highest digit is ${Math.max(...digits)}`,
+    `Lowest digit is ${Math.min(...digits)}`,
+    `First digit is ${digits[0] % 2 === 0 ? "even" : "odd"}`,
+    `Last digit is ${digits.at(-1) % 2 === 0 ? "even" : "odd"}`
+  ];
+}
+
 // modes of difficulty
 
 const DIFFICULTIES = {
   easy: {
     name: "🟢 EASY VAULT",
     length: 6,
+    attempts: 20,
+    clueEvery: 4,
     reward: 300,
     missCost: 10,
   },
   normal: {
     name: "🔵 NORMAL VAULT",
     length: 8,
-    reward: 600,
-    missCost: 10,
+    attempts: 20,
+    clueEvery: 3,
+    reward: 500,
+    missCost: 15,
   },
   legendary: {
     name: "🟣 LEGENDARY VAULT",
-    length: 16,
-    reward: 1500,
-    missCost: 15,
+    length: 9,
+    attempts: 20,
+    clueEvery: 3,
+    reward: 1000,
+    missCost: 25,
   },
   ultra: {
     name: "🔥 ULTRA VAULT",
-    length: 20,
+    length: 10,
+    attempts: 20,
+    clueEvery: 2,
     reward: 2500,
-    missCost: 20,
+    missCost: 50,
   },
 };
-
 function getDifficulty(mode = "normal") {
   return DIFFICULTIES[mode] || DIFFICULTIES.normal;
 }
@@ -123,7 +144,7 @@ Use a ${existing.secret_code.length}-digit code to attempt breach.`;
     chat_id: String(chatId),
     secret_code: secret,
     difficulty: mode,
-    attempts_left: 30,
+    attempts_left: difficulty.attempts,
     wrong_attempts: 0,
     revealed_positions: [],
     is_active: true
@@ -141,7 +162,7 @@ VAULT REWARD
 💰 ${difficulty.reward} Coins
 
 BREACH LIMIT
-❤️ 30 Attempts
+❤️ ${difficulty.attempts} Attempts
 
 BREACH COST
 💸 -${difficulty.missCost} Coins per failed attempt
@@ -274,7 +295,7 @@ ${badges || "🔓 Codebreaker"}`;
 
   let revealed = game.revealed_positions || [];
 
-  if (newWrongAttempts % 5 === 0 && revealed.length < codeLength - 1) {
+ if (newWrongAttempts % difficulty.clueEvery === 0 && revealed.length < codeLength - 1) {
     const hidden = Array.from({ length: codeLength }, (_, i) => i)
   .filter(i => !revealed.includes(i));
     const pos = hidden[Math.floor(Math.random() * hidden.length)];
@@ -306,12 +327,17 @@ The vault has vanished into the shadows.`;
   }
 
   const status = revealCode(game.secret_code, revealed);
+  const clues = generateClues(game.secret_code);
   const stats = getMatchStats(game.secret_code, guess);
 
   const clueText =
-    newWrongAttempts % 5 === 0
-      ? `\n📡 Intelligence Fragment Recovered\nCode Status:\n${status}\n`
-      : `\nCode Status:\n${status}\n`;
+    newWrongAttempts % difficulty.clueEvery === 0
+      ? `\n📡 Intelligence Report
+
+• ${clues[Math.floor(Math.random() * clues.length)]}
+
+Code Status:
+${status}\n`;
 
  return `❌ ACCESS DENIED
 
