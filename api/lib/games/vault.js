@@ -371,6 +371,18 @@ await supabase
     
   const stats = getMatchStats(game.secret_code, guess);
 
+  let dangerAlert = "";
+
+if (stats.correctPosition >= Math.ceil(codeLength * 0.6)) {
+  dangerAlert =
+    "\n🚨 SECURITY ALERT\nSomeone is getting dangerously close to breaching the vault!";
+}
+
+if (stats.correctPosition >= Math.ceil(codeLength * 0.8)) {
+  dangerAlert =
+    "\n🔥 CRITICAL ALERT\nThe vault's defenses are collapsing!";
+}
+
  const clueText =
   newWrongAttempts % difficulty.clueEvery === 0
     ? `\n📡 Intelligence Report
@@ -393,6 +405,8 @@ ${username} dropped 💸 ${MISS_COST} coins into the vault drain.
 ⬛ Not In Code: ${stats.wrongDigits}
 
 ${clueText}
+${dangerAlert}
+
 ❤️ Attempts Left: ${newAttemptsLeft}
 💼 ${username}'s Coins: ${newCoins}`;
 }
