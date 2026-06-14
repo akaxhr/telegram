@@ -145,14 +145,17 @@ async function loadChats() {
       <div class="chat-time">${formatTime(chat.created_at)}</div>
     `;
 
-    div.onclick = () => {
-      selectedChatId = chat.chat_id;
-      selectedChatTitle = chat.chat_title || chat.chat_id;
-      document.getElementById("chatTitle").innerText = selectedChatTitle;
-      clearReply();
-      loadMessages();
-      loadChats();
-    };
+    div.onclick = async () => {
+  selectedChatId = chat.chat_id;
+  selectedChatTitle = chat.chat_title || chat.chat_id;
+  document.getElementById("chatTitle").innerText = selectedChatTitle;
+
+  clearReply();
+
+  await loadMessages();
+  await loadGroupSettings();
+  await loadChats();
+};
 
     box.appendChild(div);
   });
