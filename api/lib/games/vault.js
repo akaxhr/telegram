@@ -253,10 +253,15 @@ if (!guessRegex.test(guess)) return null;
   if (guess === game.secret_code) {
     const newStreak = player.current_streak + 1;
     const bestStreak = Math.max(player.best_streak || 0, newStreak);
-    const streakPercent = getStreakPercent(newStreak);
-    const streakCoins = Math.floor(BASE_REWARD * streakPercent / 100);
-    const totalEarned = BASE_REWARD + streakCoins;
-    const newCoins = player.coins + totalEarned;
+   const streakPercent = getStreakPercent(newStreak);
+
+const totalPenalty = game.wrong_attempts * MISS_COST;
+const netReward = Math.max(0, BASE_REWARD - totalPenalty);
+
+const streakCoins = Math.floor(netReward * streakPercent / 100);
+const totalEarned = netReward + streakCoins;
+
+const newCoins = player.coins + totalEarned;
     const newWins = player.wins + 1;
 
     await supabase
@@ -286,8 +291,10 @@ if (!guessRegex.test(guess)) return null;
 
 ${username} cracked the vault code: ${game.secret_code}
 
-💰 Winning Coins: +${BASE_REWARD}
-${streakCoins > 0 ? `🔥 Streak Bonus: +${streakCoins} (${streakPercent}%)\n` : ""}🏦 Total Earned: +${totalEarned}
+💰 Base Reward: ${BASE_REWARD}
+💸 Vault Penalty: -${totalPenalty}
+🏦 Net Reward: +${netReward}
+${streakCoins > 0 ? `🔥 Streak Bonus: +${streakCoins} (${streakPercent}% of ${netReward})\n` : ""}🎁 Total Earned: +${totalEarned}
 
 🔥 Current Streak: ${newStreak}
 💼 Total Coins: ${newCoins}
@@ -298,16 +305,15 @@ ${badges || "🔓 Codebreaker"}`;
 
   const newAttemptsLeft = game.attempts_left - 1;
   const newWrongAttempts = game.wrong_attempts + 1;
-  const newCoins = Math.max(0, player.coins - MISS_COST);
+  const newCoins = player.coins;
 
   await supabase
-    .from("vault_players")
-    .update({
-      username,
-      coins: newCoins,
-      current_streak: 0
-    })
-    .eq("user_id", userId);
+  .from("vault_players")
+  .update({
+    username
+  })
+  .eq("user_id", userId);
+
 
   let revealed = game.revealed_positions || [];
 
@@ -397,7 +403,7 @@ ${status}\n`;
  return `❌ ACCESS DENIED
 ${randomFailNarration()}
 
-${username} dropped 💸 ${MISS_COST} coins into the vault drain.
+${username} added 💸 ${MISS_COST} coins to the vault penalty.
 
 🔍 Vault Scan:
 🟩 Correct Position: ${stats.correctPosition}/${codeLength}
@@ -408,7 +414,8 @@ ${clueText}
 ${dangerAlert}
 
 ❤️ Attempts Left: ${newAttemptsLeft}
-💼 ${username}'s Coins: ${newCoins}`;
+💸 Current Penalty: ${newWrongAttempts * MISS_COST} Coins
+💼 Net Reward If Cracked Now: ${Math.max(0, BASE_REWARD - newWrongAttempts * MISS_COST)} Coins`;
 }
 
 export async function vaultLeaderboard() {
