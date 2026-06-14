@@ -32,7 +32,7 @@ export default async function handler(req, res) {
 
 
 // /vault command
-if (lowerText.startsWith("/vault")) {
+if (lowerText === "/vault" || lowerText.startsWith("/vault ")) {
   if (!settings.vault_enabled) {
     return res.status(200).json({ ok: true });
   }
