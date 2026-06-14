@@ -144,6 +144,7 @@ Use a ${existing.secret_code.length}-digit code to attempt breach.`;
     chat_id: String(chatId),
     secret_code: secret,
     difficulty: mode,
+    used_clues: [],
     attempts_left: difficulty.attempts,
     wrong_attempts: 0,
     revealed_positions: [],
@@ -303,12 +304,16 @@ ${badges || "🔓 Codebreaker"}`;
   }
 
   await supabase
-    .from("vault_games")
-    .update({
-      attempts_left: newAttemptsLeft,
-      wrong_attempts: newWrongAttempts,
-      revealed_positions: revealed
-    })
+  .from("vault_games")
+  .update({
+    attempts_left: newAttemptsLeft,
+    wrong_attempts: newWrongAttempts,
+    revealed_positions: revealed,
+    used_clues:
+      newWrongAttempts % difficulty.clueEvery === 0
+        ? [...usedClues, selectedClue]
+        : usedClues
+  })
     .eq("id", game.id);
 
   if (newAttemptsLeft <= 0) {
@@ -327,18 +332,31 @@ The vault has vanished into the shadows.`;
   }
 
   const status = revealCode(game.secret_code, revealed);
+  
   const clues = generateClues(game.secret_code);
+  let usedClues = game.used_clues || [];
+let availableClues = clues.filter(clue => !usedClues.includes(clue));
+
+if (availableClues.length === 0) {
+  availableClues = clues;
+  usedClues = [];
+}
+
+const selectedClue =
+  availableClues[Math.floor(Math.random() * availableClues.length)];
+  
   const stats = getMatchStats(game.secret_code, guess);
 
-  const clueText =
+ const clueText =
   newWrongAttempts % difficulty.clueEvery === 0
     ? `\n📡 Intelligence Report
 
-• ${clues[Math.floor(Math.random() * clues.length)]}
+• ${selectedClue}
 
 Code Status:
 ${status}\n`
-    : "";
+    : `\nCode Status:
+${status}\n`;
 
  return `❌ ACCESS DENIED
 
@@ -366,8 +384,10 @@ export async function vaultLeaderboard() {
   return `🏆 GLOBAL VAULT RANKINGS\n\n` + data.map((p, i) => {
     const title = i === 0 ? "👑 Richest Operative" : "";
     const badges = [getWinBadge(p.wins), getCoinBadge(p.coins)].filter(Boolean).join(" ");
-    return `#${i + 1} ${p.username || "Unknown"} ${title}
-${badges}
-💰 ${p.coins} Coins | 🔓 ${p.wins} Breaches`;
+    return `#${i + 1} ${title ? title + " — " : ""}${p.username || "Unknown"}
+🏅 ${badges || "No badges yet"}
+💰 ${p.coins} Coins
+🔓 ${p.wins} Vault Breaches
+🔥 Best Streak: ${p.best_streak || 0}`;
   }).join("\n\n");
 }
