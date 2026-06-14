@@ -5,6 +5,35 @@ if (!password) {
   sessionStorage.setItem("admin_password", password);
 }
 
+async function trackPanelVisit() {
+  let visitorId = localStorage.getItem("panel_visitor_id");
+
+  if (!visitorId) {
+    visitorId = crypto.randomUUID();
+    localStorage.setItem("panel_visitor_id", visitorId);
+  }
+
+  await api("/api/admin/panel-visit", {
+    method: "POST",
+    body: JSON.stringify({
+      visitor_id: visitorId,
+      page: location.pathname,
+      hostname: location.hostname,
+      language: navigator.language,
+      platform: navigator.platform,
+      user_agent: navigator.userAgent,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      screen_width: screen.width,
+      screen_height: screen.height,
+      window_width: window.innerWidth,
+      window_height: window.innerHeight,
+      device_pixel_ratio: window.devicePixelRatio,
+      dark_mode: window.matchMedia("(prefers-color-scheme: dark)").matches,
+      touch_support: navigator.maxTouchPoints > 0
+    })
+  });
+}
+
 let selectedChatId = null;
 let selectedChatTitle = null;
 let replyToMessageId = null;
