@@ -105,7 +105,7 @@ if (vaultReply) {
 });
     await saveUserHistory(userId, userName, "user", text);
 
-    const isReplyToBot =
+    
     const BOT_ID = 8847459711; // your bot numeric id
 
     const isReplyToBot =
