@@ -168,6 +168,45 @@ const codeLength = game.secret_code.length;
 const difficulty = getDifficulty(game.difficulty || "normal");
 const BASE_REWARD = difficulty.reward;
 const MISS_COST = difficulty.missCost;
+
+function getMatchStats(secret, guess) {
+  let correctPosition = 0;
+  let correctDigitWrongPlace = 0;
+
+  const secretUsed = Array(secret.length).fill(false);
+  const guessUsed = Array(guess.length).fill(false);
+
+  for (let i = 0; i < secret.length; i++) {
+    if (guess[i] === secret[i]) {
+      correctPosition++;
+      secretUsed[i] = true;
+      guessUsed[i] = true;
+    }
+  }
+
+  for (let i = 0; i < guess.length; i++) {
+    if (guessUsed[i]) continue;
+
+    for (let j = 0; j < secret.length; j++) {
+      if (secretUsed[j]) continue;
+
+      if (guess[i] === secret[j]) {
+        correctDigitWrongPlace++;
+        secretUsed[j] = true;
+        guessUsed[i] = true;
+        break;
+      }
+    }
+  }
+
+  const wrongDigits = secret.length - correctPosition - correctDigitWrongPlace;
+
+  return {
+    correctPosition,
+    correctDigitWrongPlace,
+    wrongDigits,
+  };
+}
   
 const guessRegex = new RegExp(`^\\d{${codeLength}}$`);
 if (!guessRegex.test(guess)) return null;
