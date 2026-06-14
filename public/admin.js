@@ -262,15 +262,16 @@ async function deleteChat() {
 
   if (!deletePassword) return;
 
-  await api("/api/admin/delete-chat", {
-    method: "POST",
+  await api(
+  "/api/admin/chats?chat_id=" +
+    encodeURIComponent(selectedChatId),
+  {
+    method: "DELETE",
     headers: {
       "x-delete-password": deletePassword
-    },
-    body: JSON.stringify({
-      chat_id: selectedChatId
-    })
-  });
+    }
+  }
+);
 
   selectedChatId = null;
   selectedChatTitle = null;
